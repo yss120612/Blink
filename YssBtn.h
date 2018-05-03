@@ -14,6 +14,7 @@
 
 class YssBtn {
 private:
+
 	int8_t pin;
 	const uint8_t drebb = 20;
 	const uint16_t longPress = 1500;
