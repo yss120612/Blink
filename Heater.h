@@ -19,6 +19,8 @@ public:
 	~Heater();
 	void processHeater();
 	void setPower(int pw);
+	void start();
+	void stop();
 	void setup(uint8_t hp, int8_t rp);
 
 private:
@@ -28,7 +30,6 @@ private:
 	uint8_t power;
 	const uint8_t max_power = 100;
 	int curr;
-	int counter;
 	boolean heater_stopped;
 	boolean have_relay;
 	void switchRelay(boolean on);
@@ -38,7 +39,6 @@ private:
 
 Heater::Heater()
 {
-	counter = 0;
 	heater_stopped = true;
 }
 

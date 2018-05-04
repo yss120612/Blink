@@ -11,6 +11,16 @@ void Heater::processHeater() {
 		return;
 	}
 	if (!relayIsOn()) return;
+
+	curr -= power;
+	if (curr < 0) {
+		curr += max_power;
+		digitalWrite(heater_pin, LOW);
+	}
+	else
+	{
+		digitalWrite(heater_pin, HIGH);
+	}
 }
 
 void Heater::setup(uint8_t hp, int8_t rp) {
@@ -25,6 +35,8 @@ void Heater::setup(uint8_t hp, int8_t rp) {
 	}
 }
 
+
+
 void Heater::switchRelay(boolean on) {
 	if (have_relay)
 	{
@@ -37,12 +49,20 @@ boolean Heater::relayIsOn() {
 	return !have_relay || digitalRead(relay_pin) == HIGH;
 }
 
+void Heater::start() {
+	switchRelay(true);
+	heater_stopped = false;
+}
+
+void Heater::stop() {
+	switchRelay(false);
+	heater_stopped = true;
+}
 
 void Heater::setPower(int pw) {
 	boolean hs = heater_stopped;
 	heater_stopped = true;
-	power = pw;
+	power = max(min(pw, max_power),0);
 	curr = max_power / 2;
-	counter = 0;
 	heater_stopped = hs;
 }
