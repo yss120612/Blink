@@ -1,3 +1,4 @@
+#include "Heater.h"
 #include "YssBtn.h"
 #include <OLED_I2C.h>
 
@@ -6,8 +7,14 @@ OLED  myOLED(SDA, SCL, 8);
 extern uint8_t SmallFont[];
 extern uint8_t MediumNumbers[];
 extern uint8_t BigNumbers[];
-const int buzzerPin = 12;
-const int coolerPin = 3;
+const int BUZZER_PIN = 12;
+const int COOLER_PIN = 3;
+const int RELAY_PIN = 9;
+const int TERMISTOR_PIN = A3;
+const int UROVEN_PIN = A3;
+const int UROVEN_VCC_PIN = 13;
+const int TERMISTOR_B = 3435;
+const int TERMISTOR_SECOND_RESISTOR= 9990;
 
 uint16_t scrLoop = 0;
 
@@ -45,12 +52,12 @@ int MenuSelected = 0;
 void setup() {
   
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(9, OUTPUT);
+  pinMode(UROVEN_VCC_PIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);   
-  digitalWrite(13, HIGH);
-  digitalWrite(9, LOW);
-  pinMode(coolerPin, OUTPUT);
-  digitalWrite(coolerPin, LOW);
+  digitalWrite(UROVEN_PIN, HIGH);
+  digitalWrite(RELAY_PIN, LOW);
+  pinMode(COOLER_PIN, OUTPUT);
+  digitalWrite(COOLER_PIN, LOW);
    
   pinMode(A0, INPUT);
   pinMode(A3, INPUT);
@@ -100,8 +107,8 @@ void onCClick(){
 double tTermoRes(int pin) {
 	int i = analogRead(pin);
 	//сопротивление термопары
-	double Temp = 9990.0 / (1023.0 / i - 1.0);
-	Temp = log(Temp / 10000.0) / 3435.0 + 1.0 / (25.0 + 273.15);
+	double Temp = TERMISTOR_SECOND_RESISTOR / (1023.0 / i - 1.0);
+	Temp = log(Temp / 10000.0) / TERMISTOR_B + 1.0 / (25.0 + 273.15);
 	Temp = 1.0 / Temp;
 	Temp = Temp - 273.15;   // Kelvin to Celcius
 	return Temp;
@@ -137,18 +144,8 @@ void loop() {
    uint16_t mls=millis();
    if (mls-scrLoop>1000){
 
-//if (MenuSelected == 0) {
-//		   pty = pty1+12* MenuSelected;
-//	   } else if (MenuSelected == 1) {
-//		   pty = pty1 + 12 * MenuSelected;
-//	   }   else if (MenuSelected == 2) {
-//	   pty = pty1 + 12 * MenuSelected;
-//   }   else  {
-//	   pty = pty1 + 12 * MenuSelected;
-//   }
-
 	pty = pty1 + 12 * MenuSelected;
-	int vlaj = analogRead(A3);
+	
     myOLED.clrScr();
 	myOLED.setFont(MediumNumbers);
 	myOLED.printNumI(mls, LEFT, 0);
@@ -166,20 +163,21 @@ void loop() {
 
 	
 
-	double tm = tTermoRes(A0);
+	double tm = tTermoRes(TERMISTOR_PIN);
+	int vlaj = analogRead(UROVEN_PIN);
 
-	myOLED.printNumF(tTermoRes(A0),1, ptx, pty1+24);
+	myOLED.printNumF(tm,1, ptx, pty1+24);
 	///Serial.println(Temp);
 	//myOLED.drawRoundRect(ptx - 2, pty3 - 2, ptx2, pty3 + 9);
 	
 	
 	uint8_t speed = tm > 60 ? 255 : tm < 30 ? 0 : 105 + 150 / 30 * (tm - 30);
-	analogWrite(coolerPin, speed);
+	analogWrite(COOLER_PIN, speed);
 
 	if (vlaj > 40)
 	{
-		digitalWrite(13, LOW);
-		digitalWrite(9, HIGH);
+		digitalWrite(UROVEN_VCC_PIN, LOW);
+		digitalWrite(RELAY_PIN, HIGH);
 	}
 
 	myOLED.printNumI(vlaj, ptx, pty1+36);
