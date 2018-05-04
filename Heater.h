@@ -20,6 +20,7 @@ public:
 	void processHeater();
 	void setPower(int pw);
 	void setup(uint8_t hp, int8_t rp);
+
 private:
 	uint8_t heater_pin;
 	uint8_t relay_pin;
@@ -30,6 +31,8 @@ private:
 	int counter;
 	boolean heater_stopped;
 	boolean have_relay;
+	void switchRelay(boolean on);
+	boolean relayIsOn();
 };
 
 
