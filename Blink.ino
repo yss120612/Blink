@@ -1,6 +1,7 @@
 #include "kran.h"
 #include "Heater.h"
 #include "YssBtn.h"
+#include <EEPROM.h>
 #include <OLED_I2C.h>
 
 OLED  myOLED(SDA, SCL, 8);
@@ -24,7 +25,7 @@ const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
 
-
+ 
 uint16_t scrLoop = 0;
 
 const uint16_t ptx = 3;
@@ -97,10 +98,10 @@ void setup() {
 void onLClick(){
   digitalWrite(LED_BUILTIN,LOW ); 
   if (kr.isOpened()) {
-	  kr.close();
+	//  kr.close();
   }
   else {
-	  kr.open();
+	//  kr.open();
   }
   if (MenuSelected > 0)
   {
@@ -112,8 +113,8 @@ void onLClick(){
 void onRClick(){
   digitalWrite(LED_BUILTIN,HIGH);   
   
-  Serial.print("State=");
-  Serial.println(kr.measureState());
+ // Serial.print("State=");
+ // Serial.println(kr.measureState());
   if (MenuSelected <3) {
 	  MenuSelected++;
 	  scrLoop = 0;
@@ -180,7 +181,7 @@ void loop() {
 	myOLED.printNumI(mls, ptx, pty1);
 	
 
-    myOLED.print("Menu item", ptx, pty1+12);
+    myOLED.print("Braga", ptx, pty1+12);
 	//myOLED.drawRoundRect(ptx-2, pty2-2, ptx2, pty2 + 9);
 
 	//myOLED.print("Menu item", ptx, pty2);
@@ -214,7 +215,7 @@ void loop() {
     scrLoop=millis();
     }
 
-   kr.process(mls);
+kr.process(mls);
 bLeft.process();
 bRight.process();
 bOK.process();
