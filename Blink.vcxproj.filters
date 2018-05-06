@@ -27,12 +27,18 @@
     <ClInclude Include="Heater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="kran.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YssBtn.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Heater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kran.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
