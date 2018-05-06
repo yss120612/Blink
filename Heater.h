@@ -15,8 +15,11 @@
 class Heater
 {
 public:
-	Heater();
-	~Heater();
+	Heater() {
+		have_relay = false;
+		heater_stopped = true;
+	};
+	~Heater() {};
 	void processHeater();
 	void setPower(int pw);
 	void start();
@@ -37,11 +40,4 @@ private:
 };
 
 
-Heater::Heater()
-{
-	heater_stopped = true;
-}
 
-Heater::~Heater()
-{
-}

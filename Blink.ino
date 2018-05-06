@@ -8,14 +8,22 @@ OLED  myOLED(SDA, SCL, 8);
 extern uint8_t SmallFont[];
 extern uint8_t MediumNumbers[];
 extern uint8_t BigNumbers[];
-const int BUZZER_PIN = 12;
-const int COOLER_PIN = 3;
-const int RELAY_PIN = 9;
-const int TERMISTOR_PIN = A3;
-const int UROVEN_PIN = A3;
-const int UROVEN_VCC_PIN = 13;
+
+const uint8_t BUZZER_PIN = 12;
+const uint8_t COOLER_PIN = 3;
+const uint8_t RELAY_PIN = 9;
+const uint8_t TERMISTOR_PIN = A0;
+const uint8_t UROVEN_PIN = A3;
+const uint8_t UROVEN_VCC_PIN = 11;
 const int TERMISTOR_B = 3435;
 const int TERMISTOR_SECOND_RESISTOR= 9990;
+const uint8_t WATER_OPEN_PIN = 5;
+const uint8_t WATER_CLOSE_PIN = 6;
+const uint8_t WATER_MEASURE_PIN = A2;
+const uint8_t LEFT_BTN_PIN = 4;
+const uint8_t RIGHT_BTN_PIN = 8;
+const uint8_t CENTER_BTN_PIN = 7;
+
 
 uint16_t scrLoop = 0;
 
@@ -34,6 +42,7 @@ const int sdOn = 2000;
 const int sdOff = 3000;
 boolean isOn;
 YssBtn bLeft, bRight, bOK;
+Kran kr(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
 int MenuSelected = 0;
 
 //class Menu{
@@ -54,34 +63,45 @@ void setup() {
   
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(UROVEN_VCC_PIN, OUTPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  pinMode(COOLER_PIN, OUTPUT);
+  pinMode(TERMISTOR_PIN, INPUT);
+  pinMode(UROVEN_PIN, INPUT);
+  
+
   digitalWrite(LED_BUILTIN, HIGH);   
+  digitalWrite(UROVEN_VCC_PIN, HIGH);
   digitalWrite(UROVEN_PIN, HIGH);
   digitalWrite(RELAY_PIN, LOW);
-  pinMode(COOLER_PIN, OUTPUT);
   digitalWrite(COOLER_PIN, LOW);
-   
-  pinMode(A0, INPUT);
-  pinMode(A3, INPUT);
   
   Serial.begin(57600); 
   
-  bLeft.init(4);
-  bRight.init(8);
-  bOK.init(7);
+  kr.setup();
+
+  bLeft.init(LEFT_BTN_PIN);
+  bRight.init(RIGHT_BTN_PIN);
+  bOK.init(CENTER_BTN_PIN);
+
   bOK.initBeep(12,1000,30);
+  bOK.setClickFunc(onCClick);
+
   bLeft.setClickFunc(onLClick);
   bRight.setClickFunc(onRClick);
   bRight.setClickDblFunc(onRDblClick);
-  bOK.setClickFunc(onCClick);
+  
   myOLED.begin();
   myOLED.setFont(SmallFont);
-
-
-
 }
 
 void onLClick(){
-  digitalWrite(LED_BUILTIN,LOW );   
+  digitalWrite(LED_BUILTIN,LOW ); 
+  if (kr.isOpened()) {
+	  kr.close();
+  }
+  else {
+	  kr.open();
+  }
   if (MenuSelected > 0)
   {
 	  MenuSelected--;
@@ -91,6 +111,9 @@ void onLClick(){
 
 void onRClick(){
   digitalWrite(LED_BUILTIN,HIGH);   
+  
+  Serial.print("State=");
+  Serial.println(kr.measureState());
   if (MenuSelected <3) {
 	  MenuSelected++;
 	  scrLoop = 0;
@@ -143,6 +166,7 @@ boolean Bras(int power, int diap)
 
 void loop() {
    uint16_t mls=millis();
+   
    if (mls-scrLoop>1000){
 
 	pty = pty1 + 12 * MenuSelected;
@@ -190,6 +214,7 @@ void loop() {
     scrLoop=millis();
     }
 
+   kr.process(mls);
 bLeft.process();
 bRight.process();
 bOK.process();

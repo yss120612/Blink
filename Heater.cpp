@@ -40,7 +40,7 @@ void Heater::setup(uint8_t hp, int8_t rp) {
 void Heater::switchRelay(boolean on) {
 	if (have_relay)
 	{
-		digitalWrite(relay_pin, on ? HIGH : LOW);
+		digitalWrite(relay_pin, (on ? HIGH : LOW));
 	}
 }
 
