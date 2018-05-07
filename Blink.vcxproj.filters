@@ -27,7 +27,10 @@
     <ClInclude Include="Heater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="kran.h">
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Kran.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,7 +41,10 @@
     <ClCompile Include="Heater.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kran.cpp">
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Kran.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
