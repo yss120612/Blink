@@ -9,7 +9,7 @@ OLED  myOLED(SDA, SCL, 8);
 
 extern uint8_t SmallFont[];
 extern uint8_t MediumNumbers[];
-extern uint8_t BigNumbers[];
+//extern uint8_t BigNumbers[];
 
 const uint8_t BUZZER_PIN = 12;
 const uint8_t COOLER_PIN = 3;
@@ -26,7 +26,7 @@ const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
 
-char * names[] = {"Main1","Main2","Main3","Main4","Sub11","Sub12","Sub13","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
+const char * names [] = {"Main1","Main2","Main3","Main4","Sub11","Sub12","Sub13","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
 
 
 
@@ -49,54 +49,53 @@ const int sdOff = 3000;
 boolean isOn;
 YssBtn bLeft, bRight, bOK;
 Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
-int MenuSelected = 0;
 
 YsMenu * menu;
-
-YsMenuItem mi1(0, names[0]);
-YsMenuItem mi2(1, names[1]);
-YsMenuItem mi3(2, names[2]);
-YsMenuItem mi4(3, names[3]);
-
-
-YsMenuItem  mi11(4, names[4]);
-YsMenuItem  mi12(5, names[5]);
-YsMenuItem  mi13(6, names[6]);
-
-YsMenuItem mi121(11, names[4]);
-YsMenuItem mi122(12, names[5]);
-YsMenuItem mi123(13, names[6]);
-
-YsMenuItem  mi21(7, names[4]);
-YsMenuItem  mi22(8, names[5]);
-YsMenuItem  mi23(9, names[6]);
-YsMenuItem  mi24(10, names[6]);
 
 YsMenu menu0(1);
 YsMenu menu1(2);
 YsMenu menu2(3);
 YsMenu menu3(4);
 
+
+
+//YsMenuItem  mi11(4, names[4]);
+//YsMenuItem  mi12(5, names[5]);
+//YsMenuItem  mi13(6, names[6]);
+//
+//YsMenuItem mi121(11, names[7]);
+//YsMenuItem mi122(12, names[8]);
+//YsMenuItem mi123(13, names[9]);
+//
+//YsMenuItem  mi21(7, names[10]);
+//YsMenuItem  mi22(8, names[11]);
+//YsMenuItem  mi23(9, names[12]);
+//YsMenuItem  mi24(10, names[13]);
+
+//miXY menu items X level 0.1.2....; Y 0.1.2.... parent item number
+YsMenuItem  mi00[] = { YsMenuItem(0, names[0]), YsMenuItem(1, names[1]), YsMenuItem(2, names[2]),YsMenuItem(3, names[3]) };
+YsMenuItem  mi10[] = { YsMenuItem(4, names[4]), YsMenuItem(5, names[5]),YsMenuItem(6, names[6]) };
+YsMenuItem  mi21[] = { YsMenuItem(7, names[7]), YsMenuItem(8, names[8]),YsMenuItem(9, names[9]) };
+YsMenuItem  mi11[] = { YsMenuItem(10, names[10]),YsMenuItem(11, names[11]),YsMenuItem(12, names[12]) ,YsMenuItem(13, names[13]) };
+
+
+
 void initMenu() {
 	
-	YsMenuItem mm0i[] = { mi1, mi2, mi3, mi4 };
-	YsMenuItem  mm1i[] = { mi11, mi12,mi13 };
-	YsMenuItem  mm12i[] = { mi121, mi122,mi123 };
-	YsMenuItem  mm2i[] = { mi21, mi22,mi23 ,mi24 };
+	mi00[3].setSelectFunc(onMenuSelect);
+	mi21[1].setSelectFunc(onMenuSelect);
 
-	mi4.setSelectFunc(onMenuSelect);
-
-	menu0.setItems(mm0i, 4);
+	menu0.setItems(mi00, 4);
 	
-	menu1.setItems(mm1i, 3);
+	menu1.setItems(mi10, 3);
 
-	menu2.setItems(mm2i, 4);
+	menu2.setItems(mi11, 4);
 
-	menu3.setItems(mm12i, 3);
+	menu3.setItems(mi21, 3);
 
-	mi1.setSubMenu(& menu1);
-	mi12.setSubMenu(& menu3);
-	mi2.setSubMenu(& menu2);
+	mi00[0].setSubMenu(& menu1);
+	mi10[1].setSubMenu(& menu3);
+	mi00[1].setSubMenu(& menu2);
 
 	menu1.setParent(& menu0);
 	menu2.setParent(& menu0);
@@ -107,7 +106,8 @@ void initMenu() {
 }
 
 void setup() {
-  
+	
+
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(UROVEN_VCC_PIN, OUTPUT);
   pinMode(RELAY_PIN, OUTPUT);
@@ -142,47 +142,42 @@ void setup() {
   bRight.setClickFunc(onRClick);
   
   
+
   myOLED.begin();
   myOLED.setFont(SmallFont);
 }
 
 void onLClick(){
-  digitalWrite(LED_BUILTIN,LOW ); 
+ // digitalWrite(LED_BUILTIN,LOW ); 
   menu->prev();
+  scrLoop = 0;
   if (kran.isOpened()) {
 	//  kr.close();
   }
   else {
 	//  kr.open();
   }
-  if (MenuSelected > 0)
-  {
-	  MenuSelected--;
-	  scrLoop = 0;
-  }
+ 
 }
 
 void onRClick(){
-  digitalWrite(LED_BUILTIN,HIGH);   
+  //digitalWrite(LED_BUILTIN,HIGH);   
   menu->next();
- // Serial.print("State=");
- // Serial.println(kr.measureState());
-  if (MenuSelected <3) {
-	  MenuSelected++;
-	  scrLoop = 0;
-  }
-}
+  scrLoop = 0;
+ }
 
 void onOKLong() {
 	if (menu->haveParent()) {
 		menu = menu->get_parent();
+		scrLoop = 0;
 	}
+
 }
 
 void selectMenu() {
 	YsMenuItem * ymi = menu->open();
 	if (ymi != NULL) {
-		YsMenu * m = ymi->select();
+	YsMenu * m = ymi->select();
 		if (m != NULL) {
 			menu = m;
 		}
@@ -192,12 +187,14 @@ void selectMenu() {
 }
 
 void onCClick(){
-  digitalWrite(LED_BUILTIN,!digitalRead(LED_BUILTIN)   );   
+
   selectMenu();
+ // scrLoop = 0;
 }
 
 void onMenuSelect() {
 	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+
 }
 
 double tTermoRes(int pin) {

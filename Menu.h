@@ -1,6 +1,6 @@
 // Menu.h
 
-
+#include <OLED_I2C.h>
 
 #ifndef _MENU_h
 #define _MENU_h
@@ -14,40 +14,44 @@
 
 #endif
 
-
-
 class YsMenu;
 
 class YsMenuItem {
 private:
 	int id;
 	char * name;
+protected:
 	YsMenu * subMenu;
 	void (*selectFunc)();
-	
 
 public:
-	YsMenuItem(int i, char * nm) {
+	YsMenuItem(int i, const char * nm) {
 		subMenu = NULL;
 		name = nm;
 		id = i;
 	};
 
+
+
 	YsMenu *  select();
 
 	void setSelectFunc(void(*func) ()) { selectFunc = func; }
 
-	void setSubMenu(YsMenu * m);
+	void setSubMenu(const YsMenu * const m);
 
-
+	int getId() { return id; };
 
 	~YsMenuItem() {
 		//if (subMenu!=NULL) delete subMenu;
 	}
 
-	const char* get_name() const;
+	const char* get_name();
 
-	
+	void set_name(char * nm) {
+		name = nm;
+	}
+
+	void PrintState();
 };
 
 class YsMenu {
@@ -72,8 +76,8 @@ public:
 		parent = NULL;
 	};
 
-	const YsMenuItem * get_items() const;
-	const YsMenu * get_parent() const;
+	const YsMenuItem * get_items();
+	const YsMenu * get_parent();
 
 	boolean haveParent() { return parent != NULL; }
 
