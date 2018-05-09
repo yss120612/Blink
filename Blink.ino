@@ -50,7 +50,8 @@ boolean isOn;
 YssBtn bLeft, bRight, bOK;
 Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
 
-YsMenu * menu;
+YsMenuComponent * menu;
+//YsMenuParameter *par;
 
 YsMenu menu0(1);
 YsMenu menu1(2);
@@ -78,7 +79,7 @@ YsMenuItem  mi10[] = { YsMenuItem(4, names[4]), YsMenuItem(5, names[5]),YsMenuIt
 YsMenuItem  mi21[] = { YsMenuItem(7, names[7]), YsMenuItem(8, names[8]),YsMenuItem(9, names[9]) };
 YsMenuItem  mi11[] = { YsMenuItem(10, names[10]),YsMenuItem(11, names[11]),YsMenuItem(12, names[12]) ,YsMenuItem(13, names[13]) };
 
-
+YsMenuParameterB pb(1,"Hoooo");
 
 void initMenu() {
 	
@@ -94,12 +95,15 @@ void initMenu() {
 	menu3.setItems(mi21, 3);
 
 	mi00[0].setSubMenu(& menu1);
+	mi00[2].setSubMenu(&pb);
 	mi10[1].setSubMenu(& menu3);
 	mi00[1].setSubMenu(& menu2);
 
 	menu1.setParent(& menu0);
 	menu2.setParent(& menu0);
 	menu3.setParent(& menu1);
+
+	pb.setParent(& menu0);
 
 	menu = &menu0;
 	
@@ -175,14 +179,16 @@ void onOKLong() {
 }
 
 void selectMenu() {
-	YsMenuItem * ymi = menu->open();
-	if (ymi != NULL) {
-	YsMenu * m = ymi->select();
+	//YsMenuItem * ymi = menu->open();
+	//if (ymi != NULL) {
+	YsMenuComponent * m = menu->open();
 		if (m != NULL) {
+		//	//Serial.println(m->iAmIs());
 			menu = m;
+			if (menu->iAmIs() == 3) ((YsMenuParameterB *)menu)->begin_edit();
 		}
 		scrLoop = 0;
-	}
+	//}
 	
 }
 
@@ -252,6 +258,13 @@ void loop() {
 	myOLED.setFont(SmallFont);
 
 	menu->draw(&myOLED);
+	/*if (par == NULL) {
+		menu->draw(&myOLED);
+	}
+	else
+	{
+		par->draw(&myOLED);
+	}*/
 	//myOLED.printNumI(mls, ptx, pty1);
 	
 

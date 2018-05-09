@@ -22,15 +22,15 @@ const char * YsMenuItem::get_name()
 	return name;
 }
 
-YsMenu * YsMenuItem::select() {
+YsMenuComponent * YsMenuItem::select() {
 	//Serial.print(name);
 	//Serial.println(" selected");
 	//Serial.print("init submenu ");
 	//Serial.println(subMenu->get_items()[0].get_name());
 
 	
-
-	if (subMenu != NULL) {
+	
+	if (subMenu != NULL ) {
 		return subMenu;
 	}
 	
@@ -45,7 +45,7 @@ YsMenu * YsMenuItem::select() {
 
 }
 
-void YsMenuItem::setSubMenu(const YsMenu * const m) {
+void YsMenuItem::setSubMenu(YsMenuComponent * m) {
 	subMenu = m;
 }
 
@@ -73,6 +73,61 @@ void YsMenuItem::PrintState() {
 	}
 
 }
+///////////////////////////////////////
+///////   Menu Component
+//////////////////////////////////////
+
+void YsMenuComponent::setParent(YsMenuComponent * par) {
+	parent = par;
+};
+
+const YsMenuComponent * YsMenuComponent::get_parent() {
+	return parent;
+}
+
+///////////////////////////////////////
+///////   Menu Parametr
+//////////////////////////////////////
+
+void YsMenuParameter::set_name(char * nm) {
+	name = nm;
+}
+const char * YsMenuParameter::get_name() {
+	return name;
+}
+
+
+///////////////////////////////////////
+///////   Menu ParametrB
+//////////////////////////////////////
+
+void YsMenuParameterB::draw(OLED * scr) {
+	scr->print(get_name(), DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
+	if (get_value())
+	{
+		scr->print(" : YES", DRAW_X0+50, DRAW_Y0 + DRAW_DELTA_Y);
+	}
+	else {
+		scr->print(" : NO", DRAW_X0 + 50, DRAW_Y0 + DRAW_DELTA_Y);
+	}
+}
+
+void YsMenuParameterB::next() {
+	set_value(!get_value());
+	//return &items[current];
+};
+
+void YsMenuParameterB::prev() {
+	set_value(!get_value());
+};
+
+YsMenuComponent * YsMenuParameterB::open() {
+	apply_value();
+		
+	//if (&items[current].select())
+	return get_parent();
+};
+
 
 ///////////////////////////////////////
 ///////   Menu
@@ -90,8 +145,8 @@ void YsMenu::setItems(YsMenuItem * mi, int ic) {
 	
 }
 
-YsMenuItem * YsMenu::next() {
-	if (current < 0) return NULL;
+void YsMenu::next() {
+	if (current < 0) return;
 	
 	if (current == items_count-1) {
 		current = 0;
@@ -99,32 +154,26 @@ YsMenuItem * YsMenu::next() {
 	else {
 		current++;
 	}
-	return &items[current];
+	//return &items[current];
 };
 
-YsMenuItem * YsMenu::prev() {
-	if (current < 0) return NULL;
+void YsMenu::prev() {
+	if (current < 0) return;
 	if (current>0) {
 		current--;
 	}
 	else {
 		current=items_count-1;
 	}
-	return &items[current];
+	//return &items[current];
 };
 
-YsMenuItem * YsMenu::open() {
+YsMenuComponent * YsMenu::open() {
 	if (current < 0) return NULL;
-	return &items[current];
+	//if (&items[current].select())
+	return items[current].select();
 };
 
-void YsMenu::setParent(YsMenu * par) {
-	parent = par;
-};
-
-const YsMenu * YsMenu::get_parent() {
-	return parent;
-}
 
 void YsMenu::draw(OLED * scr) {
 	for (int i = 0; i < items_count; i++)
@@ -136,3 +185,4 @@ void YsMenu::draw(OLED * scr) {
 		}
 	}
 }
+
