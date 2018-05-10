@@ -52,7 +52,7 @@ public:
 		name = nm;
 	}
 
-	void PrintState();
+	//void PrintState();
 };
 
 class YsMenuComponent {
@@ -126,6 +126,7 @@ public:
 	void begin_edit() { curr_value = value; };
 	void apply_value() { value = curr_value; };
 	boolean get_value() { return curr_value; };
+	boolean get() { return value; };
 	void set_value(boolean b) { curr_value = b; };
 	uint8_t iAmIs() { return 3; }
 	void draw(OLED * scr);
@@ -145,7 +146,6 @@ public:
 		up_limit = 100;
 		down_limit = 0;
 		step = 1;
-
 	};
 	void setup(uint8_t val, uint8_t up, uint8_t down, uint8_t stp);
 	void next();
@@ -153,11 +153,11 @@ public:
 	void begin_edit() { curr_value = value; };
 	void apply_value() { value = curr_value; };
 	uint8_t get_value() { return curr_value; };
+	uint8_t get() { return value; };
 	void set_value(uint8_t b) { curr_value = b; };
 	uint8_t iAmIs() { return 4; }
 	void draw(OLED * scr);
 };
-
 
 class YsMenuParameterF : public YsMenuParameter {
 protected:
@@ -181,6 +181,7 @@ public:
 	void begin_edit() { curr_value = value; };
 	void apply_value() { value = curr_value; };
 	float  get_value() { return curr_value; };
+	float  get() { return value; };
 	void set_value(float  b) { curr_value = b; };
 	uint8_t iAmIs() { return 5; }
 	void draw(OLED * scr);

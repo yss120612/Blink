@@ -44,8 +44,10 @@ public:
 		pinMode(measure_pin, INPUT);
 		pinMode(open_pin, OUTPUT);
 		pinMode(close_pin, OUTPUT);
+		pinMode(relay_pin, OUTPUT);
 		digitalWrite(close_pin, LOW);
 		digitalWrite(open_pin, LOW);
+		digitalWrite(relay_pin, LOW);
 	}
 	void close();
 	void open();

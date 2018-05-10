@@ -26,29 +26,30 @@ const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
 
-const char * names [] = {"Main1","Main2","Main3","Main4","Sub11","Sub12","Sub13","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
+const char * names [] = {"Braga","Rectify","Setup","Main4","Sub11","Sub12","Sub13","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
 
+//float ft;
 
 
 
 uint16_t scrLoop = 0;
 
-const uint16_t ptx = 3;
-const uint16_t ptx2 = 128 - 3;
+//const uint16_t ptx = 3;
+//const uint16_t ptx2 = 128 - 3;
 
-const uint16_t pty1 = 18;
+//const uint16_t pty1 = 18;
 //const uint16_t pty2 = 30;
 //const uint16_t pty3 = 42;
 //const uint16_t pty4 = 54;
-uint16_t pty = 0;
+//uint16_t pty = 0;
 
-int period = 0;
-int curr = 0;
-const int sdOn = 2000;
-const int sdOff = 3000;
-boolean isOn;
+//int period = 0;
+//int curr = 0;
+//const int sdOn = 2000;
+//const int sdOff = 3000;
+//boolean isOn;
 YssBtn bLeft, bRight, bOK;
-Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
+//Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
 
 YsMenuComponent * menu;
 //YsMenuParameter *par;
@@ -79,10 +80,12 @@ YsMenuItem  mi10[] = { YsMenuItem(4, names[4]), YsMenuItem(5, names[5]),YsMenuIt
 YsMenuItem  mi21[] = { YsMenuItem(7, names[7]), YsMenuItem(8, names[8]),YsMenuItem(9, names[9]) };
 YsMenuItem  mi11[] = { YsMenuItem(10, names[10]),YsMenuItem(11, names[11]),YsMenuItem(12, names[12]) ,YsMenuItem(13, names[13]) };
 
-YsMenuParameterB pb(1,"Hoooo");
+YsMenuParameterB pb(1,"Boolean");
+YsMenuParameterF pf(2, "Float");
+//YsMenuParameterUI8 pui(3, "Integer");
 
 void initMenu() {
-	
+	//ft = 0;
 	mi00[3].setSelectFunc(onMenuSelect);
 	mi21[1].setSelectFunc(onMenuSelect);
 
@@ -96,7 +99,11 @@ void initMenu() {
 
 	mi00[0].setSubMenu(& menu1);
 	mi00[2].setSubMenu(&pb);
+	mi00[3].setSubMenu(&pf);
+
 	mi10[1].setSubMenu(& menu3);
+	//mi10[0].setSubMenu(&pui);
+
 	mi00[1].setSubMenu(& menu2);
 
 	menu1.setParent(& menu0);
@@ -104,8 +111,10 @@ void initMenu() {
 	menu3.setParent(& menu1);
 
 	pb.setParent(& menu0);
+	pf.setParent(&menu0);
+	//pui.setParent(&menu1);
 
-	menu = &menu0;
+	menu = NULL;// &menu0;
 	
 }
 
@@ -128,7 +137,7 @@ void setup() {
   
   Serial.begin(57600); 
   
-  kran.setup();
+ // kran.setup();
   initMenu();
 
 
@@ -146,7 +155,8 @@ void setup() {
   bRight.setClickFunc(onRClick);
   
   
-
+  //pui.setup(10,50,10,2);
+  pf.setup(20.9, 50, 10, 0.2);
   myOLED.begin();
   myOLED.setFont(SmallFont);
 }
@@ -155,12 +165,12 @@ void onLClick(){
  // digitalWrite(LED_BUILTIN,LOW ); 
   menu->prev();
   scrLoop = 0;
-  if (kran.isOpened()) {
+ // if (kran.isOpened()) {
 	//  kr.close();
-  }
-  else {
+  //}
+ // else {
 	//  kr.open();
-  }
+//  }
  
 }
 
@@ -171,9 +181,17 @@ void onRClick(){
  }
 
 void onOKLong() {
+	if (menu == NULL) {
+		menu = &menu0;
+		scrLoop = 0;
+		return;
+	}
 	if (menu->haveParent()) {
 		menu = menu->get_parent();
 		scrLoop = 0;
+	}
+	else {
+		menu = NULL;
 	}
 
 }
@@ -185,7 +203,7 @@ void selectMenu() {
 		if (m != NULL) {
 		//	//Serial.println(m->iAmIs());
 			menu = m;
-			if (menu->iAmIs() == 3) ((YsMenuParameterB *)menu)->begin_edit();
+			if (menu->iAmIs() >= 3 && menu->iAmIs()<=5) ((YsMenuParameter *)menu)->begin_edit();
 		}
 		scrLoop = 0;
 	//}
@@ -244,9 +262,9 @@ void loop() {
    
    if (mls-scrLoop>1000){
 
-	double tm = tTermoRes(TERMISTOR_PIN);
+	float tm = tTermoRes(TERMISTOR_PIN);
 	int vlaj = analogRead(UROVEN_PIN);
-	uint8_t speed = tm > 60 ? 255 : tm < 30 ? 0 : 105 + 150 / 30 * (tm - 30);
+	uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
 	analogWrite(COOLER_PIN, speed);
 
 	//pty = pty1 + 12 * MenuSelected;
@@ -257,7 +275,7 @@ void loop() {
 	myOLED.printNumI(vlaj, RIGHT,0);
 	myOLED.setFont(SmallFont);
 
-	menu->draw(&myOLED);
+	if (menu != NULL) menu->draw(&myOLED);
 	/*if (par == NULL) {
 		menu->draw(&myOLED);
 	}
@@ -300,7 +318,7 @@ void loop() {
     scrLoop=millis();
     }
 
-kran.process(mls);
+//kran.process(mls);
 bLeft.process();
 bRight.process();
 bOK.process();

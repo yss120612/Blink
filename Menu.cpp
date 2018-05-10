@@ -5,7 +5,7 @@ const uint8_t DRAW_X0=3;
 const uint8_t DRAW_X1 = 128-3;
 const uint8_t DRAW_Y0=18;
 const uint8_t DRAW_DELTA_Y=12;//пункты меню друг от друга
-const uint8_t DRAW_LETTER_X = 5;//ДЛИНА буквы по Х
+const uint8_t DRAW_LETTER_X = 6;//ДЛИНА буквы по Х
 
 const uint8_t DRAW_FRAME_X = 2;
 const uint8_t DRAW_FRAME_Y0 = 2;
@@ -50,30 +50,30 @@ void YsMenuItem::setSubMenu(YsMenuComponent * m) {
 	subMenu = m;
 }
 
-void YsMenuItem::PrintState() {
-	Serial.print("State for:");
-	Serial.print(name);
-	Serial.print(" id:");
-	Serial.print(id);
-	Serial.print(" function:");
-	if (*selectFunc)
-	{
-		Serial.print("HAVE");
-	}
-	else {
-		Serial.print("NULL");
-	}
-
-	Serial.print(" SubMenu:");
-	if (subMenu)
-	{
-		Serial.println("HAVE");
-	}
-	else {
-		Serial.println("NULL");
-	}
-
-}
+//void YsMenuItem::PrintState() {
+//	Serial.print("State for:");
+//	Serial.print(name);
+//	Serial.print(" id:");
+//	Serial.print(id);
+//	Serial.print(" function:");
+//	if (*selectFunc)
+//	{
+//		Serial.print("HAVE");
+//	}
+//	else {
+//		Serial.print("NULL");
+//	}
+//
+//	Serial.print(" SubMenu:");
+//	if (subMenu)
+//	{
+//		Serial.println("HAVE");
+//	}
+//	else {
+//		Serial.println("NULL");
+//	}
+//
+//}
 ///////////////////////////////////////
 ///////   Menu Component
 //////////////////////////////////////
