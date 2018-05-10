@@ -34,6 +34,7 @@ public:
 		kran_opened = false;
 		progress_time=0;
 	};
+	
 	void process(uint16_t ms);
 	boolean measureState();
 	boolean isOpened() {
