@@ -109,6 +109,9 @@ public:
 	void set_name(char * nm);
 	const char * get_name();
 	uint8_t iAmIs() { return 2; }
+	virtual void begin_edit()=0;
+	virtual void apply_value()=0;
+	YsMenuComponent * YsMenuParameter::open();
 };
 
 class YsMenuParameterB : public YsMenuParameter {
@@ -118,13 +121,67 @@ protected:
 public:
 	YsMenuParameterB(int i, char * nm) :YsMenuParameter(i,nm) {
 	};
-	virtual void next();
-	virtual void prev();
-	virtual YsMenuComponent * open();
-	boolean get_value() { return curr_value; };
-	void begin_edit() { curr_value=value; };
-	void set_value(boolean b) { curr_value = b; };
+	void next();
+	void prev();
+	void begin_edit() { curr_value = value; };
 	void apply_value() { value = curr_value; };
+	boolean get_value() { return curr_value; };
+	void set_value(boolean b) { curr_value = b; };
 	uint8_t iAmIs() { return 3; }
+	void draw(OLED * scr);
+};
+
+class YsMenuParameterUI8 : public YsMenuParameter {
+protected:
+	uint8_t value;
+	uint8_t curr_value;
+	uint8_t up_limit;
+	uint8_t down_limit;
+	uint8_t step;
+public:
+	YsMenuParameterUI8(int i, char * nm) :YsMenuParameter(i, nm) {
+		value = 0;
+		curr_value = 0;
+		up_limit = 100;
+		down_limit = 0;
+		step = 1;
+
+	};
+	void setup(uint8_t val, uint8_t up, uint8_t down, uint8_t stp);
+	void next();
+	void prev();
+	void begin_edit() { curr_value = value; };
+	void apply_value() { value = curr_value; };
+	uint8_t get_value() { return curr_value; };
+	void set_value(uint8_t b) { curr_value = b; };
+	uint8_t iAmIs() { return 4; }
+	void draw(OLED * scr);
+};
+
+
+class YsMenuParameterF : public YsMenuParameter {
+protected:
+	float value;
+	float curr_value;
+	float up_limit;
+	float down_limit;
+	float step;
+public:
+	YsMenuParameterF(int i, char * nm) :YsMenuParameter(i, nm) {
+		value = 50.0;
+		curr_value = 50.0;
+		up_limit = 100.0;
+		down_limit = 0.0;
+		step = 0.1;
+
+	};
+	void setup(float  val, float  up, float  down, float stp);
+	void next();
+	void prev();
+	void begin_edit() { curr_value = value; };
+	void apply_value() { value = curr_value; };
+	float  get_value() { return curr_value; };
+	void set_value(float  b) { curr_value = b; };
+	uint8_t iAmIs() { return 5; }
 	void draw(OLED * scr);
 };

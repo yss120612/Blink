@@ -5,6 +5,7 @@ const uint8_t DRAW_X0=3;
 const uint8_t DRAW_X1 = 128-3;
 const uint8_t DRAW_Y0=18;
 const uint8_t DRAW_DELTA_Y=12;//пункты меню друг от друга
+const uint8_t DRAW_LETTER_X = 5;//ДЛИНА буквы по Х
 
 const uint8_t DRAW_FRAME_X = 2;
 const uint8_t DRAW_FRAME_Y0 = 2;
@@ -96,19 +97,25 @@ const char * YsMenuParameter::get_name() {
 	return name;
 }
 
+YsMenuComponent * YsMenuParameter::open() {
+	apply_value();
+
+	//if (&items[current].select())
+	return get_parent();
+};
 
 ///////////////////////////////////////
 ///////   Menu ParametrB
 //////////////////////////////////////
 
 void YsMenuParameterB::draw(OLED * scr) {
-	scr->print(get_name(), DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
 	if (get_value())
 	{
-		scr->print(" : YES", DRAW_X0+50, DRAW_Y0 + DRAW_DELTA_Y);
+		scr->print(" : YES", DRAW_X0+DRAW_LETTER_X * (strlen(name)+1), DRAW_Y0 + DRAW_DELTA_Y);
 	}
 	else {
-		scr->print(" : NO", DRAW_X0 + 50, DRAW_Y0 + DRAW_DELTA_Y);
+		scr->print(" : NO", DRAW_X0 + DRAW_LETTER_X * (strlen(name)+1), DRAW_Y0 + DRAW_DELTA_Y);
 	}
 }
 
@@ -121,12 +128,65 @@ void YsMenuParameterB::prev() {
 	set_value(!get_value());
 };
 
-YsMenuComponent * YsMenuParameterB::open() {
-	apply_value();
-		
-	//if (&items[current].select())
-	return get_parent();
+///////////////////////////////////////
+///////   Menu Parametr UINT-8
+//////////////////////////////////////
+
+
+void YsMenuParameterUI8::setup(uint8_t val, uint8_t up, uint8_t down, uint8_t stp) {
+	up_limit = up;
+	down_limit = down;
+	value = val;
+	curr_value = val;
+	step = stp;
+}
+
+void YsMenuParameterUI8::next() {
+	if (curr_value + step <= up_limit)
+		curr_value += step;
 };
+
+void YsMenuParameterUI8::prev() {
+	if (curr_value - step >= down_limit)
+		curr_value -= step;
+};
+
+void YsMenuParameterUI8::draw(OLED * scr) {
+	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(" : ", DRAW_X0 + DRAW_LETTER_X * strlen(name), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumI(curr_value, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
+	
+}
+
+///////////////////////////////////////
+///////   Menu Parametr FLOAT
+//////////////////////////////////////
+
+
+void YsMenuParameterF::setup(float val, float up, float down, float stp) {
+	up_limit = up;
+	down_limit = down;
+	value = val;
+	curr_value = val;
+	step = stp;
+}
+
+void YsMenuParameterF::next() {
+	if (curr_value + step <= up_limit)
+		curr_value += step;
+};
+
+void YsMenuParameterF::prev() {
+	if (curr_value - step>=down_limit)
+		curr_value -= step;
+};
+
+void YsMenuParameterF::draw(OLED * scr) {
+	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(" : ", DRAW_X0 + DRAW_LETTER_X * strlen(name), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumF(curr_value,1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
+
+}
 
 
 ///////////////////////////////////////
