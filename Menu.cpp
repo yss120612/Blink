@@ -13,6 +13,7 @@ const uint8_t DRAW_FRAME_Y1 = 9;
 
 const uint8_t MAX_POS = 4;// помещаетса максимально на экране
 
+#pragma region Menu Item
 
 ///////////////////////////////////////
 ///////   Menu Item
@@ -74,6 +75,9 @@ void YsMenuItem::setSubMenu(YsMenuComponent * m) {
 //	}
 //
 //}
+#pragma endregion
+
+#pragma region Menu Component
 ///////////////////////////////////////
 ///////   Menu Component
 //////////////////////////////////////
@@ -85,6 +89,9 @@ void YsMenuComponent::setParent(YsMenuComponent * par) {
 const YsMenuComponent * YsMenuComponent::get_parent() {
 	return parent;
 }
+#pragma endregion
+
+#pragma region Menu Parametr
 
 ///////////////////////////////////////
 ///////   Menu Parametr
@@ -103,7 +110,9 @@ YsMenuComponent * YsMenuParameter::open() {
 	//if (&items[current].select())
 	return get_parent();
 };
+#pragma endregion
 
+#pragma region Boolean Parametr
 ///////////////////////////////////////
 ///////   Menu ParametrB
 //////////////////////////////////////
@@ -127,6 +136,10 @@ void YsMenuParameterB::next() {
 void YsMenuParameterB::prev() {
 	set_value(!get_value());
 };
+
+#pragma endregion
+
+#pragma region UINT Parametr
 
 ///////////////////////////////////////
 ///////   Menu Parametr UINT-8
@@ -157,6 +170,11 @@ void YsMenuParameterUI8::draw(OLED * scr) {
 	scr->printNumI(curr_value, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
 	
 }
+#pragma endregion
+
+#pragma region Float Parametr
+
+
 
 ///////////////////////////////////////
 ///////   Menu Parametr FLOAT
@@ -188,7 +206,90 @@ void YsMenuParameterF::draw(OLED * scr) {
 
 }
 
+#pragma endregion
 
+#pragma region Time Parametr
+///////////////////////////////////////
+///////   Menu Parametr TIME
+//////////////////////////////////////
+
+
+void YsMenuParameterT::setup(uint8_t  ho, uint8_t  mi, uint8_t  se, uint8_t  mo){
+	set_csec(se);
+	set_cmin(mi);
+	set_chour(ho);
+	edit_mode = mo;
+	apply_value();
+}
+
+void YsMenuParameterT::next() {
+	switch (edit_mode)
+	{
+	case 0:
+		set_csec(curr_sec + 1);
+		break;
+	case 1:
+		set_csec(curr_min + 1);
+		break;
+	case 2:
+		set_csec(curr_hour + 1);
+		break;
+	default:
+		break;
+	}
+};
+
+void YsMenuParameterT::prev() {
+	switch (edit_mode)
+	{
+	case 0:
+		set_csec(curr_sec - 1);
+		break;
+	case 1:
+		set_csec(curr_min - 1);
+		break;
+	case 2:
+		set_csec(curr_hour - 1);
+		break;
+	default:
+		break;
+	}
+};
+
+YsMenuComponent * YsMenuParameterT::open() {
+	edit_mode++;
+	if (edit_mode >= 3)
+	{
+		apply_value();
+
+		//if (&items[current].select())
+		return get_parent();
+	}
+	else
+	{
+		return this;
+	}
+};
+
+void YsMenuParameterT::draw(OLED * scr) {
+	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(" ", DRAW_X0 + DRAW_LETTER_X * strlen(name), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumI(curr_hour, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 1), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumI(curr_min, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 4), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (strlen(name) + 6), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumI(curr_sec, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 7), DRAW_Y0 + DRAW_DELTA_Y);
+
+
+
+	scr->drawRoundRect(DRAW_X0 + DRAW_LETTER_X *(strlen(name)+3*edit_mode) - DRAW_FRAME_X,
+					   DRAW_Y0 + DRAW_DELTA_Y - DRAW_FRAME_Y0, 
+					   DRAW_X1 + DRAW_LETTER_X * (strlen(name) + 3 * edit_mode +2 ) + DRAW_FRAME_X,
+					   DRAW_Y0 + DRAW_DELTA_Y + DRAW_FRAME_Y1);
+}
+#pragma endregion
+
+#pragma region Menu
 ///////////////////////////////////////
 ///////   Menu
 //////////////////////////////////////
@@ -246,3 +347,4 @@ void YsMenu::draw(OLED * scr) {
 	}
 }
 
+#pragma endregion

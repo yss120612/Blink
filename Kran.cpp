@@ -12,7 +12,11 @@ void Kran::close() {
 		digitalWrite(close_pin, HIGH);
 	}
 }
-
+void Kran::forceClose() {
+	inProgress = true;
+	progress_time = millis();
+	digitalWrite(close_pin, HIGH);
+}
 void Kran::process(uint16_t ms) {
 	if (!inProgress) return;
 	if (ms - progress_time > switch_time) {
