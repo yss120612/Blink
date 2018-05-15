@@ -227,12 +227,14 @@ void onCClick(){
 
 void onKClose() {
 
-	kran.close();
+//	kran.close();
+	kran.shiftQuantum(-2);
 }
 
 void onKOpen() {
 
-	kran.open();
+	//kran.open();
+	kran.shiftQuantum(2);
 }
 
 boolean kranState;
@@ -240,6 +242,9 @@ boolean kranState;
 void onKMeajure() {
 
 	kranState=kran.measureState();
+	//kran.openQuantum(17);
+	//kran.openQuantum(87);
+	kran.openQuantum(17);
 }
 
 
