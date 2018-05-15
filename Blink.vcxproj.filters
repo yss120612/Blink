@@ -33,6 +33,12 @@
     <ClInclude Include="Kran.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Suvid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Termometer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YssBtn.cpp">
@@ -45,6 +51,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Kran.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Suvid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Termometer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

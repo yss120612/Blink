@@ -67,7 +67,7 @@ public:
 	virtual void next()=0;
 	virtual void prev()=0;
 	virtual YsMenuComponent * open()=0;
-	const YsMenuComponent * get_parent();
+	virtual const YsMenuComponent * get_parent();
 	void setParent(YsMenuComponent * par);
 	boolean haveParent() { return parent != NULL; }
 	virtual void draw(OLED * scr)=0;
@@ -176,6 +176,7 @@ public:
 
 	};
 	void setup(float  val, float  up, float  down, float stp);
+	
 	void next();
 	void prev();
 	void begin_edit() { curr_value = value; };
@@ -198,22 +199,40 @@ protected:
 	uint8_t edit_mode;
 public:
 	YsMenuParameterT(int i, char * nm) :YsMenuParameter(i, nm) {
+		edit_mode = 0;
 	};
 	void setup(uint8_t  ho, uint8_t  mi, uint8_t  se, uint8_t  mo);
-
 	void next();
 	void prev();
-	void begin_edit() { edit_mode = 0; curr_sec = sec; curr_min = min; curr_hour = hour; };
-	void apply_value() { sec=curr_sec; min=curr_min; hour=curr_hour; };
+	void begin_edit() { 
+		switch (edit_mode)
+		{
+		case 0:
+			curr_sec = sec;
+			curr_min = min;
+			curr_hour = hour;
+			break;
+		case 1:
+			//curr_min = min;
+			break;
+		case 2:
+			//curr_hour = hour;
+			break;
+		default:
+			break;
+		}
+		};
+	const YsMenuComponent * get_parent() { edit_mode = 0; return parent; }
+	void apply_value() { edit_mode = 0; sec = curr_sec; min = curr_min; hour = curr_hour; };
 	uint8_t  get_csec() { return curr_sec; };
 	uint8_t  get_sec() { return sec; };
 	uint8_t  get_cmin() { return curr_min; };
 	uint8_t  get_min() { return min; };
 	uint8_t  get_chour() { return curr_hour; };
 	uint8_t  get_hour() { return hour; };
-	void set_csec(uint8_t  b) { if (b < 0) curr_sec = 0;else if (b>59) curr_sec = 59;  else curr_sec = b; };
-	void set_cmin(uint8_t  b) { if (b < 0) curr_min = 0; else if (b>59) curr_min = 59;  else curr_min = b; };
-	void set_chour(uint8_t  b) { if (b < 0) curr_hour = 0; else if (b>23) curr_hour = 23;  else curr_hour = b; };
+	void set_csec(int8_t  b) { if (b < 0) curr_sec =59;else if (b>59) curr_sec = 0;  else curr_sec = b; };
+	void set_cmin(int8_t  b) { if (b < 0) curr_min = 59; else if (b>59) curr_min = 0;  else curr_min = b; };
+	void set_chour(int8_t  b) { if (b < 0) curr_hour = 23; else if (b>23) curr_hour = 0;  else curr_hour = b; };
 	uint8_t iAmIs() { return 6; }
 	YsMenuComponent * open();
 	void draw(OLED * scr);

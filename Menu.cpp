@@ -6,6 +6,7 @@ const uint8_t DRAW_X1 = 128-3;
 const uint8_t DRAW_Y0=18;
 const uint8_t DRAW_DELTA_Y=12;//пункты меню друг от друга
 const uint8_t DRAW_LETTER_X = 6;//ДЛИНА буквы по Х
+const uint8_t DRAW_LETTER_Y = 6;//ДЛИНА буквы по Х
 
 const uint8_t DRAW_FRAME_X = 2;
 const uint8_t DRAW_FRAME_Y0 = 2;
@@ -220,6 +221,7 @@ void YsMenuParameterT::setup(uint8_t  ho, uint8_t  mi, uint8_t  se, uint8_t  mo)
 	set_chour(ho);
 	edit_mode = mo;
 	apply_value();
+	edit_mode = 0;
 }
 
 void YsMenuParameterT::next() {
@@ -229,10 +231,10 @@ void YsMenuParameterT::next() {
 		set_csec(curr_sec + 1);
 		break;
 	case 1:
-		set_csec(curr_min + 1);
+		set_cmin(curr_min + 1);
 		break;
 	case 2:
-		set_csec(curr_hour + 1);
+		set_chour(curr_hour + 1);
 		break;
 	default:
 		break;
@@ -246,10 +248,10 @@ void YsMenuParameterT::prev() {
 		set_csec(curr_sec - 1);
 		break;
 	case 1:
-		set_csec(curr_min - 1);
+		set_cmin(curr_min - 1);
 		break;
 	case 2:
-		set_csec(curr_hour - 1);
+		set_chour(curr_hour - 1);
 		break;
 	default:
 		break;
@@ -261,31 +263,44 @@ YsMenuComponent * YsMenuParameterT::open() {
 	if (edit_mode >= 3)
 	{
 		apply_value();
-
-		//if (&items[current].select())
-		return get_parent();
+		edit_mode = 0;
+		return parent;
 	}
 	else
 	{
+		
 		return this;
 	}
 };
 
 void YsMenuParameterT::draw(OLED * scr) {
+	
 	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
-	scr->print(" ", DRAW_X0 + DRAW_LETTER_X * strlen(name), DRAW_Y0 + DRAW_DELTA_Y);
-	scr->printNumI(curr_hour, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 1), DRAW_Y0 + DRAW_DELTA_Y);
-	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
-	scr->printNumI(curr_min, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 4), DRAW_Y0 + DRAW_DELTA_Y);
-	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (strlen(name) + 6), DRAW_Y0 + DRAW_DELTA_Y);
-	scr->printNumI(curr_sec, 1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 7), DRAW_Y0 + DRAW_DELTA_Y);
+	uint8_t sl = strlen(name);
+	scr->print(" ", DRAW_X0 + DRAW_LETTER_X * sl, DRAW_Y0 + DRAW_DELTA_Y);
+	//scr->invertText(edit_mode == 2);
+	scr->printNumI(curr_hour, DRAW_X0 + DRAW_LETTER_X * (sl + 1), DRAW_Y0 + DRAW_DELTA_Y, 2, '0');
+	//scr->invertText(false);
+	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (sl + 3), DRAW_Y0 + DRAW_DELTA_Y);
+	//scr->invertText(edit_mode == 1);
+	//scr->printNumI(curr_min, 1, DRAW_X0 + DRAW_LETTER_X * (sl + 4), DRAW_Y0 + DRAW_DELTA_Y);
+	scr->printNumI(curr_min, DRAW_X0 + DRAW_LETTER_X * (sl + 4), DRAW_Y0 + DRAW_DELTA_Y,2,'0');
+	//scr->invertText(false);
+	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (sl + 6), DRAW_Y0 + DRAW_DELTA_Y);
+	//scr->invertText(edit_mode == 0);
+	scr->printNumI(curr_sec,  DRAW_X0 + DRAW_LETTER_X * (sl + 7), DRAW_Y0 + DRAW_DELTA_Y, 2, '0');
+	//scr->invertText(false);
 
 
+	scr->drawCircle(DRAW_X0 + DRAW_LETTER_X * ((sl + 1) + (2-edit_mode) * 3) + DRAW_LETTER_X,
+		DRAW_Y0 + DRAW_DELTA_Y + DRAW_LETTER_Y/2,
+		8
+	);
 
-	scr->drawRoundRect(DRAW_X0 + DRAW_LETTER_X *(strlen(name)+3*edit_mode) - DRAW_FRAME_X,
-					   DRAW_Y0 + DRAW_DELTA_Y - DRAW_FRAME_Y0, 
-					   DRAW_X1 + DRAW_LETTER_X * (strlen(name) + 3 * edit_mode +2 ) + DRAW_FRAME_X,
-					   DRAW_Y0 + DRAW_DELTA_Y + DRAW_FRAME_Y1);
+	//scr->drawRoundRect(DRAW_X0 + DRAW_LETTER_X *(sl+3*edit_mode) - DRAW_FRAME_X,
+	//				   DRAW_Y0 + DRAW_DELTA_Y - DRAW_FRAME_Y0, 
+	//				   DRAW_X0 + DRAW_LETTER_X * (sl + 3 * edit_mode +2 ) + DRAW_FRAME_X,
+	//				   DRAW_Y0 + DRAW_DELTA_Y + DRAW_FRAME_Y1);
 }
 #pragma endregion
 

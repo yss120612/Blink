@@ -6,7 +6,7 @@
 
 
 void Kran::close() {
-	if (kran_opened) {
+	if (!inProgress && measureState()) {
 		inProgress = true;
 		progress_time = millis();
 		digitalWrite(close_pin, HIGH);
@@ -29,10 +29,12 @@ void Kran::process(uint16_t ms) {
 		digitalWrite(open_pin, LOW);
 		digitalWrite(close_pin, LOW);
 	}
+	inProgress = false;
+
 }
 
 void Kran::open() {
-	if (!kran_opened) {
+	if (!inProgress && !measureState()) {
 		inProgress = true;
 		progress_time = millis();
 		digitalWrite(open_pin, HIGH);
@@ -43,6 +45,8 @@ boolean Kran::measureState() {
 	digitalWrite(relay_pin, HIGH);
 	delay(200);
 	boolean result = analogRead(measure_pin)<100;
+	//int result= analogRead(measure_pin);
 	digitalWrite(relay_pin, LOW);
+	delay(200);
 	return result;
 }
