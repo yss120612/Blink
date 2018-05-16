@@ -15,13 +15,11 @@
 class Heater
 {
 public:
-	Heater() {
-		have_relay = false;
-		heater_stopped = true;
-	};
+	Heater(); 
 	~Heater() {};
 	void processHeater();
 	void setPower(int pw);
+	uint8_t  getPower();
 	void start();
 	void stop();
 	void setup(uint8_t hp, int8_t rp);

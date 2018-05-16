@@ -1,6 +1,8 @@
+//#include "Termometer.h"
+//#include "Heater.h"
+#include "Suvid.h"
 #include "Menu.h"
 #include "Kran.h"
-#include "Heater.h"
 #include "YssBtn.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
@@ -17,8 +19,7 @@ const uint8_t RELAY_PIN = 9;
 const uint8_t TERMISTOR_PIN = A0;
 const uint8_t UROVEN_PIN = A3;
 const uint8_t UROVEN_VCC_PIN = 11;
-const int TERMISTOR_B = 3435;
-const int TERMISTOR_SECOND_RESISTOR= 9990;
+
 const uint8_t WATER_OPEN_PIN = 5;
 const uint8_t WATER_CLOSE_PIN = 6;
 const uint8_t WATER_MEASURE_PIN = A2;
@@ -26,7 +27,7 @@ const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
 
-const char * names [] = {"Braga","Rectify","Setup","Main4","Sub11","Sub12","Sub13","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
+const char * names [] = {"Solod","Braga","Rectify","Setup","Open","Close","Meajure","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
 
 //float ft;
 
@@ -49,7 +50,11 @@ uint16_t scrLoop = 0;
 //const int sdOff = 3000;
 //boolean isOn;
 YssBtn bLeft, bRight, bOK;
-//Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
+Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
+Termometer trm(TERMISTOR_PIN);
+Heater heater;
+Suvid suvid(&heater,&trm);
+
 
 YsMenuComponent * menu;
 //YsMenuParameter *par;
@@ -80,7 +85,7 @@ YsMenuItem  mi10[] = { YsMenuItem(4, names[4]), YsMenuItem(5, names[5]),YsMenuIt
 YsMenuItem  mi21[] = { YsMenuItem(7, names[7]), YsMenuItem(8, names[8]),YsMenuItem(9, names[9]) };
 YsMenuItem  mi11[] = { YsMenuItem(10, names[10]),YsMenuItem(11, names[11]),YsMenuItem(12, names[12]) ,YsMenuItem(13, names[13]) };
 
-YsMenuParameterB pb(1,"Boolean");
+YsMenuParameterT pt(1,"Boolean");
 YsMenuParameterF pf(2, "Float");
 //YsMenuParameterUI8 pui(3, "Integer");
 
@@ -88,6 +93,10 @@ void initMenu() {
 	//ft = 0;
 	mi00[3].setSelectFunc(onMenuSelect);
 	mi21[1].setSelectFunc(onMenuSelect);
+
+	mi10[0].setSelectFunc(onKOpen);
+	mi10[1].setSelectFunc(onKClose);
+	mi10[2].setSelectFunc(onKMeajure);
 
 	menu0.setItems(mi00, 4);
 	
@@ -98,10 +107,10 @@ void initMenu() {
 	menu3.setItems(mi21, 3);
 
 	mi00[0].setSubMenu(& menu1);
-	mi00[2].setSubMenu(&pb);
+	mi00[2].setSubMenu(&pt);
 	mi00[3].setSubMenu(&pf);
 
-	mi10[1].setSubMenu(& menu3);
+	//mi10[1].setSubMenu(& menu3);
 	//mi10[0].setSubMenu(&pui);
 
 	mi00[1].setSubMenu(& menu2);
@@ -110,7 +119,7 @@ void initMenu() {
 	menu2.setParent(& menu0);
 	menu3.setParent(& menu1);
 
-	pb.setParent(& menu0);
+	pt.setParent(& menu0);
 	pf.setParent(&menu0);
 	//pui.setParent(&menu1);
 
@@ -125,7 +134,7 @@ void setup() {
   pinMode(UROVEN_VCC_PIN, OUTPUT);
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(COOLER_PIN, OUTPUT);
-  pinMode(TERMISTOR_PIN, INPUT);
+  
   pinMode(UROVEN_PIN, INPUT);
   
 
@@ -137,7 +146,7 @@ void setup() {
   
   Serial.begin(57600); 
   
- // kran.setup();
+  kran.setup();
   initMenu();
 
 
@@ -156,7 +165,7 @@ void setup() {
   
   
   //pui.setup(10,50,10,2);
-  pf.setup(20.9, 50, 10, 0.2);
+  pf.setup(29.9, 50, 10, 0.2);
   myOLED.begin();
   myOLED.setFont(SmallFont);
 }
@@ -203,7 +212,7 @@ void selectMenu() {
 		if (m != NULL) {
 		//	//Serial.println(m->iAmIs());
 			menu = m;
-			if (menu->iAmIs() >= 3 && menu->iAmIs()<=5) ((YsMenuParameter *)menu)->begin_edit();
+			if (menu->iAmIs() >= 3 && menu->iAmIs()<=6) ((YsMenuParameter *)menu)->begin_edit();
 		}
 		scrLoop = 0;
 	//}
@@ -216,20 +225,44 @@ void onCClick(){
  // scrLoop = 0;
 }
 
+void onKClose() {
+
+//	kran.close();
+	kran.shiftQuantum(-2);
+}
+
+void onKOpen() {
+
+	//kran.open();
+	kran.shiftQuantum(2);
+}
+
+boolean kranState;
+
+void onKMeajure() {
+
+	kranState=kran.measureState();
+	//kran.openQuantum(17);
+	//kran.openQuantum(87);
+	kran.openQuantum(17);
+}
+
+
+
 void onMenuSelect() {
 	digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
 }
 
-double tTermoRes(int pin) {
-	int i = analogRead(pin);
-	//сопротивление термопары
-	double Temp = TERMISTOR_SECOND_RESISTOR / (1023.0 / i - 1.0);
-	Temp = log(Temp / 10000.0) / TERMISTOR_B + 1.0 / (25.0 + 273.15);
-	Temp = 1.0 / Temp;
-	Temp = Temp - 273.15;   // Kelvin to Celcius
-	return Temp;
-}
+//double tTermoRes(int pin) {
+//	int i = analogRead(pin);
+//	//сопротивление термопары
+//	double Temp = TERMISTOR_SECOND_RESISTOR / (1023.0 / i - 1.0);
+//	Temp = log(Temp / 10000.0) / TERMISTOR_B + 1.0 / (25.0 + 273.15);
+//	Temp = 1.0 / Temp;
+//	Temp = Temp - 273.15;   // Kelvin to Celcius
+//	return Temp;
+//}
 
 boolean Bras(int power, int diap)
 {
@@ -262,7 +295,7 @@ void loop() {
    
    if (mls-scrLoop>1000){
 
-	float tm = tTermoRes(TERMISTOR_PIN);
+	float tm = trm.get_temperature();
 	int vlaj = analogRead(UROVEN_PIN);
 	uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
 	analogWrite(COOLER_PIN, speed);
@@ -272,7 +305,8 @@ void loop() {
     myOLED.clrScr();
 	myOLED.setFont(MediumNumbers);
 	myOLED.printNumF(tm,1, LEFT, 0);
-	myOLED.printNumI(vlaj, RIGHT,0);
+	//myOLED.printNumI(vlaj, RIGHT,0);
+	myOLED.printNumI(kranState, RIGHT, 0);
 	myOLED.setFont(SmallFont);
 
 	if (menu != NULL) menu->draw(&myOLED);
@@ -306,7 +340,7 @@ void loop() {
 	if (vlaj > 40)
 	{
 		digitalWrite(UROVEN_VCC_PIN, LOW);
-		digitalWrite(RELAY_PIN, HIGH);
+	//	digitalWrite(RELAY_PIN, HIGH);
 	}
 
 	//myOLED.printNumI(vlaj, ptx, pty1+36);
@@ -318,8 +352,9 @@ void loop() {
     scrLoop=millis();
     }
 
-//kran.process(mls);
+kran.process(mls);
 bLeft.process();
 bRight.process();
 bOK.process();
+trm.processTermometr();
 }

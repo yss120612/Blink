@@ -59,14 +59,14 @@ void YssBtn::process() {
 			{
 				if (downTime>0) {
 					if (clickTime>0 && mls - clickTime<dblClick) {
-						if (clickFunc) (*clickFunc)();
 						if (beep_pin>0) beep();
+						if (clickFunc) (*clickFunc)();
 						if (clickDblFunc) (*clickDblFunc)();
 						clickTime = 0;
 					}
 					else {
-						if (clickFunc) (*clickFunc)();
 						if (beep_pin>0) beep();
+						if (clickFunc) (*clickFunc)();
 						clickTime = mls;
 					}
 					downTime = 0;

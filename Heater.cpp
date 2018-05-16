@@ -4,6 +4,11 @@
 
 #include "Heater.h"
 
+Heater::Heater() {
+	have_relay = false;
+	heater_stopped = true;
+};
+
 
 void Heater::processHeater() {
 	if (heater_stopped) {
@@ -35,8 +40,6 @@ void Heater::setup(uint8_t hp, int8_t rp) {
 	}
 }
 
-
-
 void Heater::switchRelay(boolean on) {
 	if (have_relay)
 	{
@@ -57,6 +60,11 @@ void Heater::start() {
 void Heater::stop() {
 	switchRelay(false);
 	heater_stopped = true;
+}
+
+uint8_t Heater::getPower()
+{
+	return power;
 }
 
 void Heater::setPower(int pw) {
