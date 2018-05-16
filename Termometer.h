@@ -25,12 +25,13 @@ private:
 	uint8_t term_pin;
 	void calc();
 public:
-	Termometer(uint8_t tp) {
+	Termometer() {}
+
+	void setup(uint8_t tp) {
 		term_pin = tp;
 		pinMode(term_pin, INPUT);
 		counter = 0;
 	}
-
 	void processTermometr();
 
 	float get_temperature() { calc(); return temperature; }

@@ -1,5 +1,7 @@
 //#include "Termometer.h"
 //#include "Heater.h"
+#include "Uroven.h"
+#include "Discill.h"
 #include "Suvid.h"
 #include "Menu.h"
 #include "Kran.h"
@@ -50,8 +52,9 @@ uint16_t scrLoop = 0;
 //const int sdOff = 3000;
 //boolean isOn;
 YssBtn bLeft, bRight, bOK;
-Kran kran(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN,RELAY_PIN);
-Termometer trm(TERMISTOR_PIN);
+Kran kran;
+Uroven ur;
+Termometer trm;
 Heater heater;
 Suvid suvid(&heater,&trm);
 
@@ -131,11 +134,13 @@ void setup() {
 	
 
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(UROVEN_VCC_PIN, OUTPUT);
+  
+  
+
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(COOLER_PIN, OUTPUT);
   
-  pinMode(UROVEN_PIN, INPUT);
+  
   
 
   digitalWrite(LED_BUILTIN, HIGH);   
@@ -146,7 +151,11 @@ void setup() {
   
   Serial.begin(57600); 
   
-  kran.setup();
+  kran.setup(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN, RELAY_PIN);
+  ur.setup(UROVEN_PIN, UROVEN_VCC_PIN);
+  trm.setup(TERMISTOR_PIN);
+
+
   initMenu();
 
 
@@ -296,7 +305,7 @@ void loop() {
    if (mls-scrLoop>1000){
 
 	float tm = trm.get_temperature();
-	int vlaj = analogRead(UROVEN_PIN);
+	boolean vlaj = ur.isActive()?ur.process():false;
 	uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
 	analogWrite(COOLER_PIN, speed);
 
@@ -310,44 +319,7 @@ void loop() {
 	myOLED.setFont(SmallFont);
 
 	if (menu != NULL) menu->draw(&myOLED);
-	/*if (par == NULL) {
-		menu->draw(&myOLED);
-	}
-	else
-	{
-		par->draw(&myOLED);
-	}*/
-	//myOLED.printNumI(mls, ptx, pty1);
 	
-
-    //myOLED.print("Braga", ptx, pty1+12);
-	//myOLED.drawRoundRect(ptx-2, pty2-2, ptx2, pty2 + 9);
-
-	//myOLED.print("Menu item", ptx, pty2);
-	//myOLED.drawRoundRect(ptx - 2, pty3 - 2, ptx2, pty3 + 9);
-
-	
-
-	
-
-	//myOLED.printNumF(tm,1, ptx, pty1+24);
-	///Serial.println(Temp);
-	//myOLED.drawRoundRect(ptx - 2, pty3 - 2, ptx2, pty3 + 9);
-	
-	
-	
-
-	if (vlaj > 40)
-	{
-		digitalWrite(UROVEN_VCC_PIN, LOW);
-	//	digitalWrite(RELAY_PIN, HIGH);
-	}
-
-	//myOLED.printNumI(vlaj, ptx, pty1+36);
-	//myOLED.drawRoundRect(ptx - 2, pty4 - 2, ptx2, pty4 + 9);
-
-	//myOLED.drawRoundRect(ptx - 2, pty - 2, ptx2, pty + 9);
-
     myOLED.update();
     scrLoop=millis();
     }

@@ -17,5 +17,5 @@ void Suvid::process_suvid() {
 	{
 		need_pw = (targetT - tmp) * 10+5;
 	}
-	if (need_pw != pw) heater->setPower(need_pw);
+	heater->setPower(need_pw);
 }

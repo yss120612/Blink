@@ -68,6 +68,7 @@ uint8_t Heater::getPower()
 }
 
 void Heater::setPower(int pw) {
+	if (pw == power) return;
 	boolean hs = heater_stopped;
 	heater_stopped = true;
 	power = max(min(pw, max_power),0);
