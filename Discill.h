@@ -11,7 +11,7 @@
 
 
 #endif
-
+const uint16_t check_time=1000;
 class Discill {
 private:
 	Termometer *temp_kub;//термометр куба
@@ -20,7 +20,8 @@ private:
 	Heater * heater;//тен
 	Kran * kran;//водяной кран
 	uint8_t stage;//стадия
+	uint16_t last_check;
 public:
 	Discill() {};
-	void process();
+	void process(uint16_t ms);
 };
