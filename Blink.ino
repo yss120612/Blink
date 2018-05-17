@@ -29,7 +29,7 @@ const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
 
-const char * names [] = {"Solod","Braga","Rectify","Setup","Open","Close","Meajure","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
+const char * names [] = {"Solod","Braga","Rectify","Setup","Start","Pause","Close","Meajure","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
 
 //float ft;
 
