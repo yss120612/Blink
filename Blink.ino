@@ -187,11 +187,12 @@ void setup() {
   myOLED.begin();
   myOLED.setFont(SmallFont);
   heater.setup(HEATER_PIN, -1);
+ // detachInterrupt(0);
   attachInterrupt(0, onheaterProcess, RISING);
 
   interrupts();
   heater.start();
-  heater.setPower(60);
+  heater.setPower(40);
 }
 
 void onLClick(){
@@ -316,11 +317,11 @@ boolean Bras(int power, int diap)
 }
 
 void onheaterProcess() {
-	noInterrupts();
+	//noInterrupts();
 	kranStat++;
 	//Serial.println(kranStat);
 	heater.processHeater();
-	interrupts();
+	//interrupts();
 }
 
 boolean mejj=false;
