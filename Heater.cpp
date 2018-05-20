@@ -20,12 +20,13 @@ void Heater::processHeater() {
 	curr -= power;
 	if (curr < 0) {
 		curr += max_power;
-		digitalWrite(heater_pin, LOW);
+		digitalWrite(heater_pin, HIGH);
 	}
 	else
 	{
-		digitalWrite(heater_pin, HIGH);
+		digitalWrite(heater_pin, LOW);
 	}
+	//Serial.println(curr);
 }
 
 void Heater::setup(uint8_t hp, int8_t rp) {

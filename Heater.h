@@ -27,10 +27,9 @@ public:
 private:
 	uint8_t heater_pin;
 	uint8_t relay_pin;
-	uint8_t detect_0_pin;
 	uint8_t power;
 	const uint8_t max_power = 100;
-	int curr;
+	int16_t curr;
 	boolean heater_stopped;
 	boolean have_relay;
 	void switchRelay(boolean on);

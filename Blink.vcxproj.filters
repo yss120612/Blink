@@ -45,6 +45,9 @@
     <ClInclude Include="Uroven.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DallasTerm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="YssBtn.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Uroven.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DallasTerm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

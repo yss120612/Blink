@@ -1,5 +1,7 @@
 //#include "Termometer.h"
 //#include "Heater.h"
+
+#include "DallasTerm.h"
 #include "Uroven.h"
 #include "Discill.h"
 #include "Suvid.h"
@@ -8,6 +10,8 @@
 #include "YssBtn.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
+#include <OneWire.h>
+
 
 OLED  myOLED(SDA, SCL, 8);
 
@@ -21,6 +25,7 @@ const uint8_t RELAY_PIN = 9;
 const uint8_t TERMISTOR_PIN = A0;
 const uint8_t UROVEN_PIN = A3;
 const uint8_t UROVEN_VCC_PIN = 11;
+const uint8_t HEATER_PIN = 13;
 
 const uint8_t WATER_OPEN_PIN = 5;
 const uint8_t WATER_CLOSE_PIN = 6;
@@ -28,12 +33,13 @@ const uint8_t WATER_MEASURE_PIN = A2;
 const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
+const uint8_t TEMPERATURE_PIN = 10;
 
 const char * names [] = {"Solod","Braga","Rectify","Setup","Start","Pause","Close","Meajure","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
 
 //float ft;
 
-
+volatile int kranStat;
 
 uint16_t scrLoop = 0;
 
@@ -92,6 +98,8 @@ YsMenuParameterT pt(1,"Boolean");
 YsMenuParameterF pf(2, "Float");
 //YsMenuParameterUI8 pui(3, "Integer");
 
+OneWire ds(TEMPERATURE_PIN);
+
 void initMenu() {
 	//ft = 0;
 	mi00[3].setSelectFunc(onMenuSelect);
@@ -138,6 +146,7 @@ void setup() {
   
 
   pinMode(RELAY_PIN, OUTPUT);
+  pinMode(HEATER_PIN, OUTPUT);
   pinMode(COOLER_PIN, OUTPUT);
   
   
@@ -177,6 +186,12 @@ void setup() {
   pf.setup(29.9, 50, 10, 0.2);
   myOLED.begin();
   myOLED.setFont(SmallFont);
+  heater.setup(HEATER_PIN, -1);
+  attachInterrupt(0, onheaterProcess, RISING);
+
+  interrupts();
+  heater.start();
+  heater.setPower(60);
 }
 
 void onLClick(){
@@ -197,6 +212,8 @@ void onRClick(){
   menu->next();
   scrLoop = 0;
  }
+
+
 
 void onOKLong() {
 	if (menu == NULL) {
@@ -246,11 +263,11 @@ void onKOpen() {
 	kran.shiftQuantum(2);
 }
 
-boolean kranState;
+
 
 void onKMeajure() {
 
-	kranState=kran.measureState();
+//	kranState=kran.measureState();
 	//kran.openQuantum(17);
 	//kran.openQuantum(87);
 	kran.openQuantum(17);
@@ -298,24 +315,75 @@ boolean Bras(int power, int diap)
 	return res;
 }
 
+void onheaterProcess() {
+	noInterrupts();
+	kranStat++;
+	//Serial.println(kranStat);
+	heater.processHeater();
+	interrupts();
+}
 
+boolean mejj=false;
 void loop() {
-   uint16_t mls=millis();
-   
-   if (mls-scrLoop>1000){
 
-	float tm = trm.get_temperature();
+   uint16_t mls=millis();
+   uint8_t addr[8];
+   float temperature = 0;
+   if (mls-scrLoop>1000){
+	   byte data[2]; // Место для значения температуры
+	   if (mejj) {
+		   //ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
+		   //while (!ds.search(addr)) {
+			  // for (int i = 0; i < 8; i++) {
+				 //  Serial.print(addr[i], HEX);
+				 //  Serial.print(":");
+			  // }
+			  // Serial.println("");
+		   //}
+		   //Serial.println("No mode sensors");
+		   ds.reset();
+		   //ds.search(addr);
+		   //ds.select(addr);
+
+		   ds.write(0xCC); // Даем датчику DS18b20 команду пропустить поиск по адресу. В нашем случае только одно устрйоство 
+		   ds.write(0x44); // Даем датчику DS18b20 команду измерить температуру. Само значение температуры мы еще не получаем - датчик его положит во внутреннюю память
+	}
+	   else {
+		   ds.reset(); // Теперь готовимся получить значение измеренной температуры
+		   ds.write(0xCC);
+		   ds.write(0xBE); // Просим передать нам значение регистров со значением температуры
+
+						   // Получаем и считываем ответ
+		   data[0] = ds.read(); // Читаем младший байт значения температуры
+		   data[1] = ds.read(); // А теперь старший
+
+								// Формируем итоговое значение: 
+								//    - сперва "склеиваем" значение, 
+								//    - затем умножаем его на коэффициент, соответсвующий разрешающей способности (для 12 бит по умолчанию - это 0,0625)
+		   temperature = ((data[1] << 8) | data[0]) * 0.0625+2.4;
+	   }
+	   mejj = (!mejj);
+	   
+
+	   
+
+	    
+
+	   
+
+	//float tm = trm.get_temperature();
 	boolean vlaj = ur.isActive()?ur.process():false;
-	uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
-	analogWrite(COOLER_PIN, speed);
+	//uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
+	//analogWrite(COOLER_PIN, speed);
 
 	//pty = pty1 + 12 * MenuSelected;
 	
     myOLED.clrScr();
 	myOLED.setFont(MediumNumbers);
-	myOLED.printNumF(tm,1, LEFT, 0);
+	if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGHT,0);
-	myOLED.printNumI(kranState, RIGHT, 0);
+	myOLED.printNumI(kranStat, RIGHT, 0);
+	//Serial.println(kranStat);
 	myOLED.setFont(SmallFont);
 
 	if (menu != NULL) menu->draw(&myOLED);
