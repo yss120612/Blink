@@ -24,9 +24,10 @@ void YssBtn::beep() {
 	noTone(beep_pin); // выключаем звук
 }
 
-void YssBtn::process() {
+void YssBtn::process(uint16_t mls) {
 	boolean curr = digitalRead(pin);
-	uint16_t mls = millis();
+	//uint16_t mls = millis();
+
 	/* if (mls-statePrint>5000){
 	statePrint=mls;
 	Serial.print("last:");

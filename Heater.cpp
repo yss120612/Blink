@@ -31,6 +31,7 @@ void Heater::processHeater() {
 
 void Heater::setup(uint8_t hp, int8_t rp) {
 	heater_pin = hp;
+	pinMode(heater_pin, OUTPUT);
 	if (rp < 0) {
 		have_relay = false;
 	}
@@ -38,6 +39,7 @@ void Heater::setup(uint8_t hp, int8_t rp) {
 	{
 		have_relay = true;
 		relay_pin = rp;
+		pinMode(relay_pin, OUTPUT);
 	}
 }
 

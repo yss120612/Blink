@@ -37,7 +37,7 @@ protected:
 public:
 	void init(int8_t p);
 	void initBeep(int8_t p, int16_t f, int16_t d);
-	void process();
+	void process(uint16_t mls);
 	void setClickFunc(void(*func) ()) { clickFunc = func; }
 	void setClickLongFunc(void(*func) ()) { clickLongFunc = func; }
 	void setClickDblFunc(void(*func) ()) { clickDblFunc = func; }

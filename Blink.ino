@@ -291,30 +291,30 @@ void onMenuSelect() {
 //	return Temp;
 //}
 
-boolean Bras(int power, int diap)
-{
-	bool res = false;
-	int err = diap / 2;
-	for (int j = 0; j < 10; j++)
-	{
-
-		for (int i = 0; i < diap; i++)
-		{
-			err -= power;
-			if (err < 0)
-			{
-				err += diap;
-				res = true;
-			}
-			else
-			{
-				res = false;
-			}
-
-		}
-	}
-	return res;
-}
+//boolean Bras(int power, int diap)
+//{
+//	bool res = false;
+//	int err = diap / 2;
+//	for (int j = 0; j < 10; j++)
+//	{
+//
+//		for (int i = 0; i < diap; i++)
+//		{
+//			err -= power;
+//			if (err < 0)
+//			{
+//				err += diap;
+//				res = true;
+//			}
+//			else
+//			{
+//				res = false;
+//			}
+//
+//		}
+//	}
+//	return res;
+//}
 
 void onheaterProcess() {
 	//noInterrupts();
@@ -373,7 +373,7 @@ void loop() {
 	   
 
 	//float tm = trm.get_temperature();
-	boolean vlaj = ur.isActive()?ur.process():false;
+	//boolean vlaj = ur.isActive()?ur.process():false;
 	//uint8_t speed = tm > 60 ? 255 : tm < pf.get() ? 0 : 105 + 150 / pf.get() * (tm - pf.get());
 	//analogWrite(COOLER_PIN, speed);
 
@@ -394,8 +394,8 @@ void loop() {
     }
 
 kran.process(mls);
-bLeft.process();
-bRight.process();
-bOK.process();
-trm.processTermometr();
+bLeft.process(mls);
+bRight.process(mls);
+bOK.process(mls);
+//trm.processTermometr();
 }
