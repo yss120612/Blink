@@ -12,7 +12,7 @@ Heater::Heater() {
 
 void Heater::processHeater() {
 	if (heater_stopped) {
-		digitalWrite(heater_pin, LOW);
+		if (digitalRead(heater_pin)==HIGH) digitalWrite(heater_pin, LOW);
 		return;
 	}
 	if (!relayIsOn()) return;

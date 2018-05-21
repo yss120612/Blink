@@ -11,24 +11,30 @@ void Uroven::setup(uint8_t ui, uint8_t pp){
 	pinMode(power_pin, OUTPUT);
 	digitalWrite(power_pin, HIGH);
 	events = 0;
+	warning = false;
 }
 
 void Uroven::reset() {
+	warning = false;
 	digitalWrite(power_pin, HIGH);
 	events = 0;
 }
 
-boolean Uroven::process() {
+void Uroven::process() {
+	if (warning) return;
 	if (analogRead(uroven_pin) > tolerance) {
 		events++;
 	if (events >= event_count) {
 		digitalWrite(power_pin, LOW);
-		return true;
+		warning = true;
 	}
 	}
-	return false;
 }
 
 boolean Uroven::isActive() {
 	return 	digitalRead(power_pin)==HIGH;
+}
+
+boolean Uroven::isWarning() {
+	return 	warning;
 }

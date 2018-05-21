@@ -18,12 +18,14 @@ class Uroven
 {
 public:
 	Uroven() {};
-	boolean process();
+	void process();
 	boolean isActive();
+	boolean isWarning();
 	void setup(uint8_t ui, uint8_t pp);
 	void reset();
 private:
 	uint8_t events;
 	uint8_t uroven_pin;
 	uint8_t power_pin;
+	boolean warning;
 };
