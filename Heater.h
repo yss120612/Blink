@@ -20,6 +20,7 @@ public:
 	void processHeater();
 	void setPower(int pw);
 	uint8_t  getPower();
+	int16_t  getCurr();
 	void start();
 	void stop();
 	void setup(uint8_t hp, int8_t rp);
@@ -27,8 +28,8 @@ public:
 private:
 	uint8_t heater_pin;
 	uint8_t relay_pin;
-	uint8_t power;
-	const uint8_t max_power = 100;
+	int8_t power;
+	const int8_t max_power = 100;
 	int16_t curr;
 	boolean heater_stopped;
 	boolean have_relay;

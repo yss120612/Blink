@@ -11,7 +11,7 @@ Heater::Heater() {
 
 
 void Heater::processHeater() {
-	if (heater_stopped) {
+	if (heater_stopped) { 
 		if (digitalRead(heater_pin)==HIGH) digitalWrite(heater_pin, LOW);
 		return;
 	}
@@ -70,11 +70,17 @@ uint8_t Heater::getPower()
 	return power;
 }
 
+int16_t Heater::getCurr()
+{
+	return curr;
+}
+
 void Heater::setPower(int pw) {
 	if (pw == power) return;
 	boolean hs = heater_stopped;
 	heater_stopped = true;
-	power = max(min(pw, max_power),0);
+	power = max(min(pw, max_power), 0);
 	curr = max_power / 2;
+	//curr = 0;
 	heater_stopped = hs;
 }

@@ -11,6 +11,12 @@
 
 
 #endif
+
+#include "Uroven.h"
+#include "Kran.h"
+#include "Heater.h"
+#include "Termometer.h"
+
 /*
 stage=0 начало
 stage=1 разгон до temp_start

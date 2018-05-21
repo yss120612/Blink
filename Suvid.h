@@ -1,7 +1,13 @@
 // Suvid.h
 
+#ifndef _HEATER_h
 #include "Heater.h"
+#endif
+#ifndef _TERMOMETER_h
 #include "Termometer.h"
+#endif
+
+
 #ifndef _SUVID_h
 #define _SUVID_h
 //

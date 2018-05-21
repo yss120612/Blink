@@ -2,11 +2,11 @@
 //#include "Heater.h"
 
 #include "DallasTerm.h"
-#include "Uroven.h"
+
 #include "Discill.h"
 #include "Suvid.h"
 #include "Menu.h"
-#include "Kran.h"
+
 #include "YssBtn.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
@@ -25,7 +25,7 @@ const uint8_t RELAY_PIN = 9;
 const uint8_t TERMISTOR_PIN = A0;
 const uint8_t UROVEN_PIN = A3;
 const uint8_t UROVEN_VCC_PIN = 11;
-const uint8_t HEATER_PIN = 13;
+const uint8_t HEATER_PIN = 9;
 
 const uint8_t WATER_OPEN_PIN = 5;
 const uint8_t WATER_CLOSE_PIN = 6;
@@ -192,7 +192,7 @@ void setup() {
 
   interrupts();
   heater.start();
-  heater.setPower(40);
+  heater.setPower(45);
 }
 
 void onLClick(){
@@ -217,6 +217,8 @@ void onRClick(){
 
 
 void onOKLong() {
+	heater.setPower(heater.getPower() - 10);
+	return;
 	if (menu == NULL) {
 		menu = &menu0;
 		scrLoop = 0;
@@ -248,7 +250,8 @@ void selectMenu() {
 
 void onCClick(){
 
-  selectMenu();
+	heater.setPower(heater.getPower()+1);
+  //selectMenu();
  // scrLoop = 0;
 }
 
@@ -331,39 +334,39 @@ void loop() {
    uint8_t addr[8];
    float temperature = 0;
    if (mls-scrLoop>1000){
-	   byte data[2]; // Место для значения температуры
-	   if (mejj) {
-		   //ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
-		   //while (!ds.search(addr)) {
-			  // for (int i = 0; i < 8; i++) {
-				 //  Serial.print(addr[i], HEX);
-				 //  Serial.print(":");
-			  // }
-			  // Serial.println("");
-		   //}
-		   //Serial.println("No mode sensors");
-		   ds.reset();
-		   //ds.search(addr);
-		   //ds.select(addr);
+	//   byte data[2]; // Место для значения температуры
+	//   if (mejj) {
+	//	   //ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
+	//	   //while (!ds.search(addr)) {
+	//		  // for (int i = 0; i < 8; i++) {
+	//			 //  Serial.print(addr[i], HEX);
+	//			 //  Serial.print(":");
+	//		  // }
+	//		  // Serial.println("");
+	//	   //}
+	//	   //Serial.println("No mode sensors");
+	//	   ds.reset();
+	//	   //ds.search(addr);
+	//	   //ds.select(addr);
 
-		   ds.write(0xCC); // Даем датчику DS18b20 команду пропустить поиск по адресу. В нашем случае только одно устрйоство 
-		   ds.write(0x44); // Даем датчику DS18b20 команду измерить температуру. Само значение температуры мы еще не получаем - датчик его положит во внутреннюю память
-	}
-	   else {
-		   ds.reset(); // Теперь готовимся получить значение измеренной температуры
-		   ds.write(0xCC);
-		   ds.write(0xBE); // Просим передать нам значение регистров со значением температуры
+	//	   ds.write(0xCC); // Даем датчику DS18b20 команду пропустить поиск по адресу. В нашем случае только одно устрйоство 
+	//	   ds.write(0x44); // Даем датчику DS18b20 команду измерить температуру. Само значение температуры мы еще не получаем - датчик его положит во внутреннюю память
+	//}
+	//   else {
+	//	   ds.reset(); // Теперь готовимся получить значение измеренной температуры
+	//	   ds.write(0xCC);
+	//	   ds.write(0xBE); // Просим передать нам значение регистров со значением температуры
 
-						   // Получаем и считываем ответ
-		   data[0] = ds.read(); // Читаем младший байт значения температуры
-		   data[1] = ds.read(); // А теперь старший
+	//					   // Получаем и считываем ответ
+	//	   data[0] = ds.read(); // Читаем младший байт значения температуры
+	//	   data[1] = ds.read(); // А теперь старший
 
-								// Формируем итоговое значение: 
-								//    - сперва "склеиваем" значение, 
-								//    - затем умножаем его на коэффициент, соответсвующий разрешающей способности (для 12 бит по умолчанию - это 0,0625)
-		   temperature = ((data[1] << 8) | data[0]) * 0.0625+2.4;
-	   }
-	   mejj = (!mejj);
+	//							// Формируем итоговое значение: 
+	//							//    - сперва "склеиваем" значение, 
+	//							//    - затем умножаем его на коэффициент, соответсвующий разрешающей способности (для 12 бит по умолчанию - это 0,0625)
+	//	   temperature = ((data[1] << 8) | data[0]) * 0.0625+2.4;
+	//   }
+	//   mejj = (!mejj);
 	   
 
 	   
@@ -381,9 +384,10 @@ void loop() {
 	
     myOLED.clrScr();
 	myOLED.setFont(MediumNumbers);
-	if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
-	//myOLED.printNumI(vlaj, RIGHT,0);
-	myOLED.printNumI(kranStat, RIGHT, 0);
+	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
+	//myOLED.printNumI(vlaj, RIGurrT,0);
+	myOLED.printNumI(heater.getCurr(), LEFT, 0);
+	myOLED.printNumI(heater.getPower(), RIGHT, 0);
 	//Serial.println(kranStat);
 	myOLED.setFont(SmallFont);
 
