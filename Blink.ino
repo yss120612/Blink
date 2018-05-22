@@ -326,11 +326,15 @@ void onMenuSelect() {
 //	return res;
 //}
 
+volatile byte cn[100];
+volatile int counter = 0;
 void onheaterProcess() {
 	//noInterrupts();
 	kranStat++;
 	//Serial.println(kranStat);
-	heater.processHeater();
+	cn[counter]=heater.processHeater();
+	if (counter < 99) counter++;
+	else counter = 0;
 	//interrupts();
 }
 
@@ -393,10 +397,12 @@ void loop() {
 	myOLED.setFont(MediumNumbers);
 	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGurrT,0);
-	myOLED.printNumI(heater.getCurr(), LEFT, 0);
+int x = 0;
+	for (int i = 0; i < 100; i++) x += cn[i];
+	myOLED.printNumI(x, LEFT , 0);
 	myOLED.printNumI(heater.getPower(), RIGHT, 0);
 	//Serial.println(kranStat);
-	myOLED.setFont(SmallFont);
+	//myOLED.setFont(SmallFont);
 
 	if (menu != NULL) menu->draw(&myOLED);
 	

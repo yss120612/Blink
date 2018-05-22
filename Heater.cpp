@@ -10,21 +10,23 @@ Heater::Heater() {
 };
 
 
-void Heater::processHeater() {
+boolean Heater::processHeater() {
 	if (heater_stopped) { 
 		if (digitalRead(heater_pin)==HIGH) digitalWrite(heater_pin, LOW);
-		return;
+		return false;
 	}
-	if (!relayIsOn()) return;
+	if (!relayIsOn()) return false;
 	
 	curr -= power;
 	if (curr < 0) {
 		curr += max_power;
 		digitalWrite(heater_pin, HIGH);
+		return true;
 	}
 	else
 	{
 		digitalWrite(heater_pin, LOW);
+		return false;
 	}
 	//Serial.println(curr);
 }
