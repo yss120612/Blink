@@ -17,7 +17,7 @@ class Heater
 public:
 	Heater(); 
 	~Heater() {};
-	void processHeater();
+	boolean processHeater();
 	void setPower(int pw);
 	uint8_t  getPower();
 	int16_t  getCurr();
@@ -29,7 +29,7 @@ private:
 	uint8_t heater_pin;
 	uint8_t relay_pin;
 	int8_t power;
-	const int8_t max_power = 100;
+	const int8_t max_power = 120;
 	int16_t curr;
 	boolean heater_stopped;
 	boolean have_relay;
