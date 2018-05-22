@@ -16,7 +16,7 @@ void Heater::processHeater() {
 		return;
 	}
 	if (!relayIsOn()) return;
-
+	
 	curr -= power;
 	if (curr < 0) {
 		curr += max_power;
@@ -81,6 +81,5 @@ void Heater::setPower(int pw) {
 	heater_stopped = true;
 	power = max(min(pw, max_power), 0);
 	curr = max_power / 2;
-	//curr = 0;
 	heater_stopped = hs;
 }

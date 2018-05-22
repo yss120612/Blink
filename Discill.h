@@ -1,5 +1,22 @@
 // Discill.h
 //Процесс дистиляции сырца
+
+#ifndef _HEATER_h
+#include "Heater.h"
+#endif
+#ifndef _TERMOMETER_h
+#include "Termometer.h"
+#endif
+
+#ifndef _UROVEN_h
+#include "Uroven.h"
+#endif
+
+#ifndef _KRAN_h
+#include "Kran.h"
+#endif
+
+
 #ifndef _DISCILL_h
 #define _DISCILL_h
 
@@ -12,10 +29,6 @@
 
 #endif
 
-#include "Uroven.h"
-#include "Kran.h"
-#include "Heater.h"
-#include "Termometer.h"
 
 /*
 stage=0 начало

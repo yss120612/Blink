@@ -1,19 +1,24 @@
-//#include "Termometer.h"
-//#include "Heater.h"
 
-#include "DallasTerm.h"
-
-#include "Discill.h"
-#include "Suvid.h"
-#include "Menu.h"
-
-#include "YssBtn.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
 #include <OneWire.h>
 
+#include "DallasTerm.h"
 
-OLED  myOLED(SDA, SCL, 8);
+#include "Uroven.h"
+#include "Kran.h"
+#include "Heater.h"
+#include "Termometer.h"
+#include "Menu.h"
+#include "YssBtn.h"
+
+#include "Discill.h"
+#include "Suvid.h"
+
+
+
+
+
 
 extern uint8_t SmallFont[];
 extern uint8_t MediumNumbers[];
@@ -57,6 +62,8 @@ uint16_t scrLoop = 0;
 //const int sdOn = 2000;
 //const int sdOff = 3000;
 //boolean isOn;
+
+OLED  myOLED(SDA, SCL, 8);
 YssBtn bLeft, bRight, bOK;
 Kran kran;
 Uroven ur;
