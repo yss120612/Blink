@@ -42,6 +42,15 @@ stage=10 аварийное завершение (смотри err)
 
 const uint16_t check_time=1000;
 const uint8_t t_tolerance=5;
+//const uint8_t t_tsa_avary = 60;//температура ТСА при которой пытаемся скорректироваться
+const uint8_t max_mode_corrected = 3;//количество попыток скорректироваться
+
+const uint8_t shift_water = 3;//при корректировке добавляем воду на
+const uint8_t shift_power = 5;//при корректировке сбавляем мощность на
+
+const uint8_t time_wait_correct = 5;//минут ждем коррекцию между попытками
+const uint8_t time_wait_kran;//отключение (минуты) крана после выключения тена (если нет протечек)
+
 class Discill {
 private:
 	Termometer *temp_kub;//термометр куба
@@ -52,6 +61,7 @@ private:
 	Kran * kran;//водяной кран
 	uint8_t stage;//стадия
 	uint16_t last_check;
+
 	//границы температуры
 	uint8_t temp_start;
 	uint8_t temp_tsa_error;
@@ -61,11 +71,19 @@ private:
 
 	uint8_t work_power;//мощность обогревателя во время перегона
 	uint8_t work_water;//мощность потока воды 17-87 во время перегона
-	uint8_t kran_off_pause;//отключение (минуты) крана после выключения тена (если нет протечек)
-	uint16_t kran_process_active;
+
 	
+	uint16_t kran_process_active;
+	uint16_t correction_process_active;
+
+	boolean checkTTSA();
+	boolean checkTKub();
+	boolean checkUroven();
+
+	uint8_t modeCorrected;//сколько раз корректировали воду + нагрев
+	void correctMode();
 public:
-	Discill() { stage = 0; temp_start = 60; temp_tsa_error = 55; temp_end_process = 98; kran_off_pause = 2 * 60; err = 0; work_power = 50; work_water = 25; };
+	Discill() { stage = 0; temp_start = 60; temp_tsa_error = 55; temp_end_process = 98; time_wait_kran = 2 * 60; err = 0; work_power = 50; work_water = 25; };
 	void start();
 	void stop();
 	
@@ -80,6 +98,8 @@ public:
 		uroven = ur;
 		stage = 1;
 		kran_process_active = 0;
+		correction_process_active = 0;
+		temp_tsa_error = 60;
 	}
 
 	void process(uint16_t ms);

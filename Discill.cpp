@@ -6,11 +6,12 @@
 
 void Discill::error(uint8_t e) {
 	err = e;
+	stage = 10;
 }
 
 
 void Discill::stop() {
-	kran_process_active = millis()+kran_off_pause*1000;
+	kran_process_active = millis()+time_wait_kran*1000*60;
 	heater->stop();
 }
 
@@ -39,10 +40,13 @@ void Discill::start() {
 	}
 
 	if (tk >= temp_end_process) {
+		stage = 8;
 		stop();
 		return;
 	}
 	
+	modeCorrected = 0;
+
 	if (tk >= temp_start) {
 		initPeregon();
 		return;
@@ -64,6 +68,16 @@ void Discill::initPeregon() {
 	stage = 2;
 }
 
+void Discill::correctMode() {
+	if (modeCorrected >= max_mode_corrected) {
+		error(11);
+		return;
+	}
+	modeCorrected++;
+	heater->setPower(heater->getPower() - shift_power);
+	kran->shiftQuantum(-shift_water);
+	correction_process_active= millis() + time_wait_correct * 1000 * 60;
+}
 
 void Discill::process(uint16_t ms) {
 	
@@ -72,7 +86,12 @@ void Discill::process(uint16_t ms) {
 		if (ms > kran_process_active) {
 			kran_process_active = 0;
 			kran->forceClose();
-			if (err > 0) stage = 10;
+		}
+	}
+
+	if (correction_process_active > 0) {
+		if (ms > kran_process_active) {
+			correction_process_active = 0;
 		}
 	}
 
@@ -80,6 +99,18 @@ void Discill::process(uint16_t ms) {
 
 	if (err > 0) {
 		stop();
+	}
+
+	switch (stage)
+	{
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	default:
+		break;
 	}
 
 	if (ms - last_check > check_time) {
@@ -104,3 +135,4 @@ void Discill::process(uint16_t ms) {
 
 	}
 }
+
