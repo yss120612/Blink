@@ -49,7 +49,7 @@ const uint8_t shift_water = 3;//при корректировке добавляем воду на
 const uint8_t shift_power = 5;//при корректировке сбавляем мощность на
 
 const uint8_t time_wait_correct = 5;//минут ждем коррекцию между попытками
-const uint8_t time_wait_kran;//отключение (минуты) крана после выключения тена (если нет протечек)
+const uint8_t time_wait_kran=2;//отключение (минуты) крана после выключения тена (если нет протечек)
 
 class Discill {
 private:
@@ -83,7 +83,7 @@ private:
 	uint8_t modeCorrected;//сколько раз корректировали воду + нагрев
 	void correctMode();
 public:
-	Discill() { stage = 0; temp_start = 60; temp_tsa_error = 55; temp_end_process = 98; time_wait_kran = 2 * 60; err = 0; work_power = 50; work_water = 25; };
+	Discill() { stage = 0; temp_start = 60; temp_tsa_error = 55; temp_end_process = 98; err = 0; work_power = 50; work_water = 25; };
 	void start();
 	void stop();
 	

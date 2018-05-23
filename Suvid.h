@@ -3,8 +3,8 @@
 #ifndef _HEATER_h
 #include "Heater.h"
 #endif
-#ifndef _TERMOMETER_h
-#include "Termometer.h"
+#ifndef _DALLASTERM_h
+#include "DallasTerm.h"
 #endif
 
 
@@ -20,20 +20,24 @@
 
 
 #endif
+const uint16_t test_time=1000;
 
 class Suvid {
 private:
 	Heater * heater;
-	Termometer * term;
+	DallasTerm * term;
 	float targetT;
+	uint16_t last_time;
 public:
-	Suvid(Heater * he, Termometer * tr) {
+	Suvid(Heater * he, DallasTerm * tr) {
 		heater = he;
 		term = tr;
 		targetT = 0;
+		last_time = 0;
 	}
 	void set_T(float t) {
 		targetT = t;
 	}
-	void process_suvid();
+	void process_suvid(uint16_t);
+	int getHeaterPower() { return heater->getPower(); };
 };

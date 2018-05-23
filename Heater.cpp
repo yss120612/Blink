@@ -7,28 +7,29 @@
 Heater::Heater() {
 	have_relay = false;
 	heater_stopped = true;
+	cy = false;
 };
 
 
-boolean Heater::processHeater() {
+void Heater::processHeater() {
 	if (heater_stopped) { 
 		if (digitalRead(heater_pin)==HIGH) digitalWrite(heater_pin, LOW);
-		return false;
+		return ;
 	}
-	if (!relayIsOn()) return false;
+	if (!relayIsOn()) return;
+	
+	cy = !cy;
+	if (!cy) return;
 	
 	curr -= power;
 	if (curr < 0) {
 		curr += max_power;
 		digitalWrite(heater_pin, HIGH);
-		return true;
 	}
 	else
 	{
 		digitalWrite(heater_pin, LOW);
-		return false;
 	}
-	//Serial.println(curr);
 }
 
 void Heater::setup(uint8_t hp, int8_t rp) {

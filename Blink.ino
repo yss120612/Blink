@@ -62,12 +62,15 @@ uint16_t scrLoop = 0;
 //const int sdOn = 2000;
 //const int sdOff = 3000;
 //boolean isOn;
+OneWire ds(TEMPERATURE_PIN);
+uint8_t  tkube[] = { 0x28,0xFF,0x73,0x37,0x67,0x14,0x02,0x11 };
 
 OLED  myOLED(SDA, SCL, 8);
 YssBtn bLeft, bRight, bOK;
 Kran kran;
 Uroven ur;
-Termometer trm;
+DallasTerm trm(tkube,&ds,2.5);
+
 Heater heater;
 Suvid suvid(&heater,&trm);
 
@@ -105,7 +108,7 @@ YsMenuParameterT pt(1,"Boolean");
 YsMenuParameterF pf(2, "Float");
 //YsMenuParameterUI8 pui(3, "Integer");
 
-OneWire ds(TEMPERATURE_PIN);
+
 
 void initMenu() {
 	//ft = 0;
@@ -142,7 +145,7 @@ void initMenu() {
 	//pui.setParent(&menu1);
 
 	menu = NULL;// &menu0;
-	
+		
 }
 
 void setup() {
@@ -169,8 +172,8 @@ void setup() {
   
   kran.setup(WATER_CLOSE_PIN, WATER_OPEN_PIN, WATER_MEASURE_PIN, RELAY_PIN);
   ur.setup(UROVEN_PIN, UROVEN_VCC_PIN);
-  trm.setup(TERMISTOR_PIN);
-
+  //trm.setup(TERMISTOR_PIN);
+  
 
   initMenu();
 
@@ -198,8 +201,10 @@ void setup() {
   attachInterrupt(0, onheaterProcess, RISING);
 
   interrupts();
+  trm.set12bit();
   heater.start();
-  heater.setPower(45);
+  //heater.setPower(45);
+  suvid.set_T(60);
 }
 
 void onLClick(){
@@ -326,15 +331,16 @@ void onMenuSelect() {
 //	return res;
 //}
 
-volatile byte cn[100];
-volatile int counter = 0;
+//volatile byte cn[100];
+//volatile int counter = 0;
 void onheaterProcess() {
 	//noInterrupts();
 	kranStat++;
 	//Serial.println(kranStat);
-	cn[counter]=heater.processHeater();
-	if (counter < 99) counter++;
-	else counter = 0;
+	//cn[counter]=
+		heater.processHeater();
+	//if (counter < 99) counter++;
+	//else counter = 0;
 	//interrupts();
 }
 
@@ -345,17 +351,17 @@ void loop() {
    uint8_t addr[8];
    float temperature = 0;
    if (mls-scrLoop>1000){
-	//   byte data[2]; // Место для значения температуры
-	//   if (mejj) {
-	//	   //ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
-	//	   //while (!ds.search(addr)) {
-	//		  // for (int i = 0; i < 8; i++) {
-	//			 //  Serial.print(addr[i], HEX);
-	//			 //  Serial.print(":");
-	//		  // }
-	//		  // Serial.println("");
-	//	   //}
-	//	   //Serial.println("No mode sensors");
+	   //byte data[2]; // Место для значения температуры
+	   //if (mejj) {
+		  // ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
+		  // while (!ds.search(addr)) {
+			 //  for (int i = 0; i < 8; i++) {
+				//   Serial.print(addr[i], HEX);
+				//   Serial.print(":");
+			 //  }
+			 //  Serial.println("");
+		  // }
+		  // Serial.println("No mode sensors");
 	//	   ds.reset();
 	//	   //ds.search(addr);
 	//	   //ds.select(addr);
@@ -376,7 +382,7 @@ void loop() {
 	//							//    - сперва "склеиваем" значение, 
 	//							//    - затем умножаем его на коэффициент, соответсвующий разрешающей способности (для 12 бит по умолчанию - это 0,0625)
 	//	   temperature = ((data[1] << 8) | data[0]) * 0.0625+2.4;
-	//   }
+	   //}
 	//   mejj = (!mejj);
 	   
 
@@ -397,10 +403,10 @@ void loop() {
 	myOLED.setFont(MediumNumbers);
 	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGurrT,0);
-int x = 0;
-	for (int i = 0; i < 100; i++) x += cn[i];
-	myOLED.printNumI(x, LEFT , 0);
-	myOLED.printNumI(heater.getPower(), RIGHT, 0);
+//int x = 0;
+	//for (int i = 0; i < 100; i++) x += cn[i];
+	myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
+	myOLED.printNumF(trm.getTemp(),1, RIGHT, 0);
 	//Serial.println(kranStat);
 	//myOLED.setFont(SmallFont);
 
@@ -414,5 +420,7 @@ kran.process(mls);
 bLeft.process(mls);
 bRight.process(mls);
 bOK.process(mls);
+trm.process(mls);
+suvid.process_suvid(mls);
 //trm.processTermometr();
 }
