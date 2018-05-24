@@ -15,7 +15,7 @@
 
 
 #endif
-const uint8_t dim = 1;
+const uint8_t dim = 5;
 const uint16_t interval = 1000;
 class DallasTerm
 {
