@@ -1,4 +1,5 @@
 
+#include "Beeper.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
 #include <OneWire.h>
@@ -70,9 +71,10 @@ YssBtn bLeft, bRight, bOK;
 Kran kran;
 Uroven ur;
 DallasTerm trm(tkube,&ds,2.5);
+Beeper beeper;
 
 Heater heater;
-Suvid suvid(&heater,&trm);
+Suvid suvid(&heater,&trm,&beeper);
 
 
 YsMenuComponent * menu;
@@ -156,7 +158,7 @@ void setup() {
   
 
   pinMode(RELAY_PIN, OUTPUT);
-  pinMode(HEATER_PIN, OUTPUT);
+  //pinMode(HEATER_PIN, OUTPUT);
   pinMode(COOLER_PIN, OUTPUT);
   
   
@@ -176,13 +178,14 @@ void setup() {
   
 
   initMenu();
-
+  beeper.setup(BUZZER_PIN);
 
   bLeft.init(LEFT_BTN_PIN);
   bRight.init(RIGHT_BTN_PIN);
   bOK.init(CENTER_BTN_PIN);
 
-  bOK.initBeep(12,1000,30);
+  //bOK.initBeep(12,1000,30);
+  bOK.initBeep(&beeper);
   bOK.setClickFunc(onCClick);
   bOK.setClickLongFunc(onOKLong);
 
@@ -202,9 +205,11 @@ void setup() {
 
   interrupts();
   trm.set12bit();
-  heater.start();
+ // heater.start();
+  
   //heater.setPower(45);
-  suvid.set_T(60);
+  suvid.start(60,10);
+
 }
 
 void onLClick(){
@@ -347,7 +352,7 @@ void onheaterProcess() {
 boolean mejj=false;
 void loop() {
 
-   uint16_t mls=millis();
+   long mls=millis();
    uint8_t addr[8];
    float temperature = 0;
    if (mls-scrLoop>1000){

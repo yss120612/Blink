@@ -42,7 +42,7 @@ void Kran::shiftQuantum(int8_t oq)
 	}
 }
 
-void Kran::process(uint16_t ms) {
+void Kran::process(long ms) {
 	if (!inProgress && !inQuantum) return;
 	if (inProgress) {
 		if (ms - progress_time > switch_time) {
@@ -57,7 +57,7 @@ void Kran::process(uint16_t ms) {
 			inProgress = false;
 			if (quantum > 0) {
 					digitalWrite(open_pin, HIGH);
-					progress_time = millis();
+					progress_time = ms;
 			}
 		}
 	}

@@ -84,6 +84,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Beeper.h" />
     <ClInclude Include="DallasTerm.h" />
     <ClInclude Include="Discill.h" />
     <ClInclude Include="Heater.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="__vm\.Blink.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Beeper.cpp" />
     <ClCompile Include="DallasTerm.cpp" />
     <ClCompile Include="Discill.cpp" />
     <ClCompile Include="Heater.cpp" />
