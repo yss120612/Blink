@@ -208,7 +208,7 @@ void setup() {
  // heater.start();
   
   //heater.setPower(45);
-  suvid.start(60,10);
+  suvid.start(60,1);
 
 }
 
