@@ -24,7 +24,6 @@ void DallasTerm::process(uint16_t ms) {
        temp[counter]= (ds->read() | (ds->read()<<8)) * 0.0625+delta;
 	   counter = (counter < dim - 1) ? counter + 1:0;
 	   meajured = false;
-	
 	}
 	else {
 		ds->write(0x44); // Даем датчику DS18b20 команду измерить температуру. Само значение температуры мы еще не получаем - датчик его положит во внутреннюю память

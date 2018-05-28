@@ -20,8 +20,10 @@ void Uroven::reset() {
 	events = 0;
 }
 
-void Uroven::process() {
+void Uroven::process(long ms) {
 	if (warning) return;
+	if (ms - last_meajure, meajure_time) return;
+	last_meajure = ms;
 	if (analogRead(uroven_pin) > tolerance) {
 		events++;
 	if (events >= event_count) {

@@ -420,12 +420,13 @@ void loop() {
     myOLED.update();
     scrLoop=millis();
     }
-
-kran.process(mls);
-bLeft.process(mls);
-bRight.process(mls);
-bOK.process(mls);
-trm.process(mls);
-suvid.process_suvid(mls);
+	beeper.process(mls);
+	ur.process(mls);
+	kran.process(mls);
+	bLeft.process(mls);
+	bRight.process(mls);
+	bOK.process(mls);
+	trm.process(mls);
+	suvid.process_suvid(mls);
 //trm.processTermometr();
 }

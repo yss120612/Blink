@@ -6,133 +6,133 @@
 
 void Discill::error(uint8_t e) {
 	err = e;
-	stage = 10;
+	end_reason = DSEND_ERROR;
 }
 
-
 void Discill::stop() {
-	kran_process_active = millis()+time_wait_kran*1000*60;
+	
+	kran_process_active = millis()+time_wait_kran*60000;
 	heater->stop();
+	stage = DS_WAITOFF;
 }
 
 void Discill::start() {
-	stage = 0;
-	float tk=0;
-	err = 0;
-	if (temp_tsarga != NULL) {
-		tk = temp_tsarga->get_temperature();
-	}
+	stage = DS_OFF;
+	err = DSERR_OK;
+	end_reason = DSEND_NO;
 
-	if (tk >= temp_tsa_error) {
-		error(11);//перегрев ТСА
+	if (heater == NULL) {
+		error(DSERR_NOHEATER);
 		return;
 	}
-
-	tk = 0;
-
-	if (temp_kub == NULL) {//обязательно
-		error(10);//нед градусника в кубе - досвидос
+	if (temp_tsa == NULL) {
+		error(DSERR_NOTTSA);
 		return;
 	}
-	else {
-
-		tk=temp_kub->get_temperature();
-	}
-
-	if (tk >= temp_end_process) {
-		stage = 8;
-		stop();
+	if (kran == NULL) {
+		error(DSERR_NOKRAN);
 		return;
 	}
-	
-	modeCorrected = 0;
-
-	if (tk >= temp_start) {
-		initPeregon();
+	if (temp_kub == NULL) {
+		error(DSERR_NOTKUB);
 		return;
 	}
-
-	if (uroven != NULL) {
+	if (uroven == NULL) {
 		uroven->reset();
+		error(DSERR_NOUROVEN);
+		return;
 	}
-	
-	kran->forceClose();
-	heater->setPower(100);
-	heater->start();
-	stage = 1;
+	initForceMode();
 }
 
-void Discill::initPeregon() {
+void Discill::initForceMode() {
+	heater->setPower(100);
+	heater->start();
+	kran->forceClose();
+	stage = DS_FORSAJ;
+}
+
+void Discill::initWorkMode() {
 	heater->setPower(work_power);
 	kran->openQuantum(work_water);
-	stage = 2;
+	stage = DS_WORK;
 }
 
 void Discill::correctMode() {
+	//поджимаем мощу и расширяем кран
+	//так можно сделать прои перегреве ТСА max_mode_corrected раз
 	if (modeCorrected >= max_mode_corrected) {
-		error(11);
+		error(DSERR_HOTTSA);
 		return;
 	}
 	modeCorrected++;
 	heater->setPower(heater->getPower() - shift_power);
 	kran->shiftQuantum(-shift_water);
-	correction_process_active= millis() + time_wait_correct * 1000 * 60;
+	correction_process_active= millis() + time_wait_correct * 60000;
 }
 
-void Discill::process(uint16_t ms) {
+void Discill::process(long ms) {
 	
 
 	if (kran_process_active > 0) {
-		if (ms > kran_process_active) {
+		if (kran_process_active - ms<0) {
 			kran_process_active = 0;
 			kran->forceClose();
+			stage = DS_OFF;
 		}
 	}
 
 	if (correction_process_active > 0) {
-		if (ms > kran_process_active) {
+		if (correction_process_active-ms<0) {
 			correction_process_active = 0;
 		}
 	}
 
-	if (stage == 0 || stage>7) return;
+	if (stage <=DS_WAITOFF) return;
 
-	if (err > 0) {
+	if (err > DSERR_OK) {
 		stop();
+		return;
 	}
+
+	if (last_check + check_time - ms > 0) return;
+	last_check = ms;
+
+	if (correction_process_active==0 && temp_tsa->get_temperature() > temp_tsa_error)
+	{
+		correctMode();
+	}
+	
+	if (uroven->isActive && uroven->isWarning) {
+		stop();
+		stage = DSEND_UROVEN;
+		return;
+	}
+
+	if (temp_kub->get_temperature() > temp_end_process) {
+		stop();
+		stage = DSEND_TKUB;
+		return;
+	}
+	
 
 	switch (stage)
 	{
-	case 1:
+	case DS_FORSAJ:
+		if (temp_kub->get_temperature() > temp_start) {
+			initWorkMode();
+		}
 		break;
-	case 2:
+	case DS_WORK:
 		break;
-	case 3:
-		break;
+	
 	default:
 		break;
 	}
 
-	if (ms - last_check > check_time) {
-		float tmp;
-		if (temp_kub == NULL) {//обязательно
-			error(10);
-		}
-		else {
-
-			temp_kub->get_temperature();
-		}
-		
-		
-		
-		if (temp_tsa != NULL) {
-			temp_tsa->get_temperature();
-		}
-
-		//if (uroven)
-
-		last_check = millis();
+	
+	
 
 	}
-}
+
 

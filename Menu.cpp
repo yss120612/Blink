@@ -52,30 +52,6 @@ void YsMenuItem::setSubMenu(YsMenuComponent * m) {
 	subMenu = m;
 }
 
-//void YsMenuItem::PrintState() {
-//	Serial.print("State for:");
-//	Serial.print(name);
-//	Serial.print(" id:");
-//	Serial.print(id);
-//	Serial.print(" function:");
-//	if (*selectFunc)
-//	{
-//		Serial.print("HAVE");
-//	}
-//	else {
-//		Serial.print("NULL");
-//	}
-//
-//	Serial.print(" SubMenu:");
-//	if (subMenu)
-//	{
-//		Serial.println("HAVE");
-//	}
-//	else {
-//		Serial.println("NULL");
-//	}
-//
-//}
 #pragma endregion
 
 #pragma region Menu Component
@@ -204,7 +180,6 @@ void YsMenuParameterF::draw(OLED * scr) {
 	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
 	scr->print(" : ", DRAW_X0 + DRAW_LETTER_X * strlen(name), DRAW_Y0 + DRAW_DELTA_Y);
 	scr->printNumF(curr_value,1, DRAW_X0 + DRAW_LETTER_X * (strlen(name) + 3), DRAW_Y0 + DRAW_DELTA_Y);
-
 }
 
 #pragma endregion
@@ -278,18 +253,17 @@ void YsMenuParameterT::draw(OLED * scr) {
 	scr->print(name, DRAW_X0, DRAW_Y0 + DRAW_DELTA_Y);
 	uint8_t sl = strlen(name);
 	scr->print(" ", DRAW_X0 + DRAW_LETTER_X * sl, DRAW_Y0 + DRAW_DELTA_Y);
-	//scr->invertText(edit_mode == 2);
+	
 	scr->printNumI(curr_hour, DRAW_X0 + DRAW_LETTER_X * (sl + 1), DRAW_Y0 + DRAW_DELTA_Y, 2, '0');
-	//scr->invertText(false);
+	
 	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (sl + 3), DRAW_Y0 + DRAW_DELTA_Y);
-	//scr->invertText(edit_mode == 1);
-	//scr->printNumI(curr_min, 1, DRAW_X0 + DRAW_LETTER_X * (sl + 4), DRAW_Y0 + DRAW_DELTA_Y);
+	
 	scr->printNumI(curr_min, DRAW_X0 + DRAW_LETTER_X * (sl + 4), DRAW_Y0 + DRAW_DELTA_Y,2,'0');
-	//scr->invertText(false);
+	
 	scr->print(":", DRAW_X0 + +DRAW_LETTER_X * (sl + 6), DRAW_Y0 + DRAW_DELTA_Y);
-	//scr->invertText(edit_mode == 0);
+	
 	scr->printNumI(curr_sec,  DRAW_X0 + DRAW_LETTER_X * (sl + 7), DRAW_Y0 + DRAW_DELTA_Y, 2, '0');
-	//scr->invertText(false);
+	
 
 
 	scr->drawCircle(DRAW_X0 + DRAW_LETTER_X * ((sl + 1) + (2-edit_mode) * 3) + DRAW_LETTER_X,
