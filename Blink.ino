@@ -91,7 +91,7 @@ DallasTerm trm(tkube,&ds,2.5);
 Beeper beeper;
 
 Heater heater;
-//Suvid suvid(&heater,&trm,&beeper);
+Suvid suvid(&heater,&trm,&beeper);
 //DS1302 clock(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
 
 //iarduino_RTC clock(RTC_DS1302, CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
@@ -457,20 +457,20 @@ void loop() {
 
 	//pty = pty1 + 12 * MenuSelected;
 	
-   // myOLED.clrScr();
-	//myOLED.setFont(MediumNumbers);
+    myOLED.clrScr();
+	myOLED.setFont(MediumNumbers);
 	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGurrT,0);
 //int x = 0;
 	//for (int i = 0; i < 100; i++) x += cn[i];
-	//myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
+	myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
 	//myOLED.printNumF(trm.getTemp(),1, RIGHT, 0);
 	//Serial.println(kranStat);
-	//myOLED.setFont(SmallFont);
+	myOLED.setFont(SmallFont);
 
-	//if (menu != NULL) menu->draw(&myOLED);
+	if (menu != NULL) menu->draw(&myOLED);
 	
-    //myOLED.update();
+    myOLED.update();
     scrLoop=millis();
     }
 	beeper.process(mls);
