@@ -103,7 +103,7 @@ void Discill::process(long ms) {
 		correctMode();
 	}
 	
-	if (uroven->isActive && uroven->isWarning) {
+	if (uroven->isActive() && uroven->isWarning()) {
 		stop();
 		stage = DSEND_UROVEN;
 		return;

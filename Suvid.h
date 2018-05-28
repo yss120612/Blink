@@ -1,5 +1,7 @@
 // Suvid.h
 
+#include <OLED_I2C.h>
+
 #ifndef _HEATER_h
 #include "Heater.h"
 #endif

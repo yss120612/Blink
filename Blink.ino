@@ -1,4 +1,7 @@
 
+//#include <RTClib.h>
+#include <DS1302.h>
+
 #include "Beeper.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
@@ -25,29 +28,43 @@ extern uint8_t SmallFont[];
 extern uint8_t MediumNumbers[];
 //extern uint8_t BigNumbers[];
 
-const uint8_t BUZZER_PIN = 12;
-const uint8_t COOLER_PIN = 3;
-const uint8_t RELAY_PIN = 9;
-const uint8_t TERMISTOR_PIN = A0;
-const uint8_t UROVEN_PIN = A3;
-const uint8_t UROVEN_VCC_PIN = 11;
-const uint8_t HEATER_PIN = 9;
 
+const uint8_t COOLER_PIN = 3;
+const uint8_t LEFT_BTN_PIN = 4;
 const uint8_t WATER_OPEN_PIN = 5;
 const uint8_t WATER_CLOSE_PIN = 6;
-const uint8_t WATER_MEASURE_PIN = A2;
-const uint8_t LEFT_BTN_PIN = 4;
-const uint8_t RIGHT_BTN_PIN = 8;
 const uint8_t CENTER_BTN_PIN = 7;
+const uint8_t RIGHT_BTN_PIN = 8;
+const uint8_t RELAY_PIN = 9;
+const uint8_t HEATER_PIN = 9;
 const uint8_t TEMPERATURE_PIN = 10;
+const uint8_t UROVEN_VCC_PIN = 11;
+const uint8_t BUZZER_PIN = 12;
+const uint8_t CLOCK_RST_PIN = 3;
+const uint8_t CLOCK_DAT_PIN = 5;
+const uint8_t CLOCK_CLK_PIN = 6;
 
-const char * names [] = {"Solod","Braga","Rectify","Setup","Start","Pause","Close","Meajure","SubSub121","SubSub122","SubSub123","Sub21","Sub22","Sub23","Sub24"};
+const uint8_t TERMISTOR_PIN = A0;
+const uint8_t WATER_MEASURE_PIN = A2;
+const uint8_t UROVEN_PIN = A3;
+
+
+
+
+
+
+
+
+
+
+
+const char * names [] = {"Sd","Ba","Reify","Setup","Strt","Pae","Clo","Meajure","SS121","SS122","SS123","Sub21","Sub22","Sub23","Sub24"};
 
 //float ft;
 
 volatile int kranStat;
 
-uint16_t scrLoop = 0;
+long scrLoop = 0;
 
 //const uint16_t ptx = 3;
 //const uint16_t ptx2 = 128 - 3;
@@ -74,9 +91,11 @@ DallasTerm trm(tkube,&ds,2.5);
 Beeper beeper;
 
 Heater heater;
-Suvid suvid(&heater,&trm,&beeper);
+//Suvid suvid(&heater,&trm,&beeper);
+//DS1302 clock(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
 
-
+//iarduino_RTC clock(RTC_DS1302, CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
+DS1302 rtc(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
 YsMenuComponent * menu;
 //YsMenuParameter *par;
 
@@ -147,7 +166,8 @@ void initMenu() {
 	//pui.setParent(&menu1);
 
 	menu = NULL;// &menu0;
-		
+	//clock.begin();
+	
 }
 
 void setup() {
@@ -167,7 +187,7 @@ void setup() {
   digitalWrite(LED_BUILTIN, HIGH);   
   digitalWrite(UROVEN_VCC_PIN, HIGH);
   digitalWrite(UROVEN_PIN, HIGH);
-  digitalWrite(RELAY_PIN, LOW);
+  //digitalWrite(RELAY_PIN, LOW);
   digitalWrite(COOLER_PIN, LOW);
   
   Serial.begin(57600); 
@@ -206,10 +226,14 @@ void setup() {
   interrupts();
   trm.set12bit();
  // heater.start();
-  
-  //heater.setPower(45);
-  suvid.start(60,1);
+ /* Time t(2018, 5, 28, 23, 00, 00, Time::kSunday);
 
+  rtc.writeProtect(false);
+  rtc.halt(false);
+  rtc.time(t);*/
+  //heater.setPower(45);
+  //suvid.start(60,1);
+ // clock.begin();
 }
 
 void onLClick(){
@@ -355,8 +379,37 @@ void loop() {
    long mls=millis();
    uint8_t addr[8];
    float temperature = 0;
-   if (mls-scrLoop>1000){
-	   //byte data[2]; // Место для значения температуры
+   if (scrLoop+1000-mls<0){
+	   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+	   ////char buf[32];
+
+	   ////// Print the RAM byte values as hex using the byte interface.
+	   ////for (int i = 0; i < DS1302::kRamSize; ++i) {
+		  //// snprintf(buf, sizeof(buf), "[%02X]", rtc.readRam(i));
+		  //// Serial.print(buf);
+	   ////}
+	   ////Serial.println();
+	   Time t = rtc.time();
+
+  // Name the day of the week.
+  //const String day = dayAsString(t.day);
+
+  // Format the time and date and insert into the temporary buffer.
+  char buf[50];
+  snprintf(buf, sizeof(buf), "%s %04d-%02d-%02d %02d:%02d:%02d",
+           "day",
+           t.yr, t.mon, t.date,
+           t.hr, t.min, t.sec);
+
+  // Print the formatted string to serial so we can see the time.
+  Serial.println(buf);
+	   //Serial.println(clock.gettime("d-m-Y, H:i:s, D"));
+	  /* Serial.print(clock.now().hour());
+	   Serial.print(":");
+	   Serial.print(clock.now().minute());
+	   Serial.print(":");
+	   Serial.println(clock.now().second());*/
+		   //byte data[2]; // Место для значения температуры
 	   //if (mejj) {
 		  // ds.reset(); // Начинаем взаимодействие со сброса всех предыдущих команд и параметров
 		  // while (!ds.search(addr)) {
@@ -404,20 +457,20 @@ void loop() {
 
 	//pty = pty1 + 12 * MenuSelected;
 	
-    myOLED.clrScr();
-	myOLED.setFont(MediumNumbers);
+   // myOLED.clrScr();
+	//myOLED.setFont(MediumNumbers);
 	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGurrT,0);
 //int x = 0;
 	//for (int i = 0; i < 100; i++) x += cn[i];
-	myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
-	myOLED.printNumF(trm.getTemp(),1, RIGHT, 0);
+	//myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
+	//myOLED.printNumF(trm.getTemp(),1, RIGHT, 0);
 	//Serial.println(kranStat);
 	//myOLED.setFont(SmallFont);
 
-	if (menu != NULL) menu->draw(&myOLED);
+	//if (menu != NULL) menu->draw(&myOLED);
 	
-    myOLED.update();
+    //myOLED.update();
     scrLoop=millis();
     }
 	beeper.process(mls);
@@ -427,6 +480,6 @@ void loop() {
 	bRight.process(mls);
 	bOK.process(mls);
 	trm.process(mls);
-	suvid.process_suvid(mls);
+	//suvid.process_suvid(mls);
 //trm.processTermometr();
 }
