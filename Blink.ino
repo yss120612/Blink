@@ -1,20 +1,19 @@
 
 //#include <RTClib.h>
 #include <DS1302.h>
-
-#include "Beeper.h"
 #include <EEPROM.h>
 #include <OLED_I2C.h>
 #include <OneWire.h>
 
+#include "Beeper.h"
 #include "DallasTerm.h"
-
 #include "Uroven.h"
-#include "Kran.h"
-#include "Heater.h"
 #include "Termometer.h"
 #include "Menu.h"
 #include "YssBtn.h"
+#include "Kran.h"
+#include "Heater.h"
+
 
 #include "Discill.h"
 #include "Suvid.h"
@@ -40,6 +39,7 @@ const uint8_t HEATER_PIN = 9;
 const uint8_t TEMPERATURE_PIN = 10;
 const uint8_t UROVEN_VCC_PIN = 11;
 const uint8_t BUZZER_PIN = 12;
+
 const uint8_t CLOCK_RST_PIN = 3;
 const uint8_t CLOCK_DAT_PIN = 5;
 const uint8_t CLOCK_CLK_PIN = 6;
@@ -48,42 +48,17 @@ const uint8_t TERMISTOR_PIN = A0;
 const uint8_t WATER_MEASURE_PIN = A2;
 const uint8_t UROVEN_PIN = A3;
 
-
-
-
-
-
-
-
-
-
-
 const char * names [] = {"Sd","Ba","Reify","Setup","Strt","Pae","Clo","Meajure","SS121","SS122","SS123","Sub21","Sub22","Sub23","Sub24"};
-
-//float ft;
 
 volatile int kranStat;
 
 long scrLoop = 0;
 
-//const uint16_t ptx = 3;
-//const uint16_t ptx2 = 128 - 3;
-
-//const uint16_t pty1 = 18;
-//const uint16_t pty2 = 30;
-//const uint16_t pty3 = 42;
-//const uint16_t pty4 = 54;
-//uint16_t pty = 0;
-
-//int period = 0;
-//int curr = 0;
-//const int sdOn = 2000;
-//const int sdOff = 3000;
-//boolean isOn;
 OneWire ds(TEMPERATURE_PIN);
 uint8_t  tkube[] = { 0x28,0xFF,0x73,0x37,0x67,0x14,0x02,0x11 };
 
-OLED  myOLED(SDA, SCL, 8);
+//OLED  myOLED(SDA, SCL, 8);
+OLED  myOLED(SDA, SCL);
 YssBtn bLeft, bRight, bOK;
 Kran kran;
 Uroven ur;
@@ -471,6 +446,7 @@ void loop() {
 	if (menu != NULL) menu->draw(&myOLED);
 	
     myOLED.update();
+	
     scrLoop=millis();
     }
 	beeper.process(mls);
