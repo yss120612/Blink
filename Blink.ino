@@ -2,8 +2,9 @@
 //#include <RTClib.h>
 #include <DS1302.h>
 #include <EEPROM.h>
-#include <OLED_I2C.h>
+//#include <OLED_I2C.h>
 #include <OneWire.h>
+#include <U8glib.h>
 
 #include "Beeper.h"
 #include "DallasTerm.h"
@@ -23,8 +24,8 @@
 
 
 
-extern uint8_t SmallFont[];
-extern uint8_t MediumNumbers[];
+//extern uint8_t SmallFont[];
+//extern uint8_t MediumNumbers[];
 //extern uint8_t BigNumbers[];
 
 
@@ -54,11 +55,14 @@ volatile int kranStat;
 
 long scrLoop = 0;
 
+
+U8GLIB_SSD1306_128X64 u8g(U8G_I2C_OPT_NONE | U8G_I2C_OPT_DEV_0);
+
 OneWire ds(TEMPERATURE_PIN);
 uint8_t  tkube[] = { 0x28,0xFF,0x73,0x37,0x67,0x14,0x02,0x11 };
 
 //OLED  myOLED(SDA, SCL, 8);
-OLED  myOLED(SDA, SCL);
+//OLED  myOLED(SDA, SCL);
 YssBtn bLeft, bRight, bOK;
 Kran kran;
 Uroven ur;
@@ -192,8 +196,8 @@ void setup() {
   
   //pui.setup(10,50,10,2);
   pf.setup(29.9, 50, 10, 0.2);
-  myOLED.begin();
-  myOLED.setFont(SmallFont);
+  //myOLED.begin();
+  //myOLED.setFont(SmallFont);
   heater.setup(HEATER_PIN, -1);
  // detachInterrupt(0);
   attachInterrupt(0, onheaterProcess, RISING);
@@ -209,6 +213,20 @@ void setup() {
   //heater.setPower(45);
   //suvid.start(60,1);
  // clock.begin();
+  //u8g.setColorIndex(1);
+
+  //u8g.setFont(u8g_font_10x20);
+  //u8g.setFont(u8g_font_4x6);
+  //u8g.setFont(u8g_font_5x7);
+  //u8g.setFont(u8g_font_5x8);
+  u8g.setFontPosTop();
+  u8g.setFont(u8g_font_6x10);//norm
+							 //u8g.setFont(u8g_font_6x12);
+							 //u8g.setFont(u8g_font_6x13);
+							 //u8g.setFont(u8g_font_7x13);
+							 //u8g.setFont(u8g_font_7x14);
+							 //u8g.setFont(u8g_font_8x13);
+							 //u8g.setFont(u8g_font_);
 }
 
 void onLClick(){
@@ -233,8 +251,8 @@ void onRClick(){
 
 
 void onOKLong() {
-	heater.setPower(heater.getPower() - 10);
-	return;
+	//heater.setPower(heater.getPower() - 10);
+	//return;
 	if (menu == NULL) {
 		menu = &menu0;
 		scrLoop = 0;
@@ -266,9 +284,9 @@ void selectMenu() {
 
 void onCClick(){
 
-	heater.setPower(heater.getPower()+1);
-  //selectMenu();
- // scrLoop = 0;
+//	heater.setPower(heater.getPower()+1);
+  selectMenu();
+  scrLoop = 0;
 }
 
 void onKClose() {
@@ -364,20 +382,16 @@ void loop() {
 		  //// Serial.print(buf);
 	   ////}
 	   ////Serial.println();
-	   Time t = rtc.time();
+	   
 
   // Name the day of the week.
   //const String day = dayAsString(t.day);
 
   // Format the time and date and insert into the temporary buffer.
-  char buf[50];
-  snprintf(buf, sizeof(buf), "%s %04d-%02d-%02d %02d:%02d:%02d",
-           "day",
-           t.yr, t.mon, t.date,
-           t.hr, t.min, t.sec);
+  
 
   // Print the formatted string to serial so we can see the time.
-  Serial.println(buf);
+  //Serial.println(buf);
 	   //Serial.println(clock.gettime("d-m-Y, H:i:s, D"));
 	  /* Serial.print(clock.now().hour());
 	   Serial.print(":");
@@ -421,7 +435,11 @@ void loop() {
 
 	   
 
-	    
+  u8g.firstPage();
+  do {
+	  draw();
+  } while (u8g.nextPage());
+
 
 	   
 
@@ -432,20 +450,22 @@ void loop() {
 
 	//pty = pty1 + 12 * MenuSelected;
 	
-    myOLED.clrScr();
-	myOLED.setFont(MediumNumbers);
+   // myOLED.clrScr();
+	//myOLED.setFont(SmallFont);
+	//myOLED.setFont(MediumNumbers);
 	//if (temperature>1) myOLED.printNumF(temperature,1, LEFT, 0);
 	//myOLED.printNumI(vlaj, RIGurrT,0);
 //int x = 0;
 	//for (int i = 0; i < 100; i++) x += cn[i];
-	myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
+	//myOLED.printNumI(suvid.getHeaterPower(),LEFT , 0);
 	//myOLED.printNumF(trm.getTemp(),1, RIGHT, 0);
 	//Serial.println(kranStat);
-	myOLED.setFont(SmallFont);
+	//myOLED.print(buf,0, 0);
+	//myOLED.setFont(SmallFont);
 
-	if (menu != NULL) menu->draw(&myOLED);
+	//if (menu != NULL) menu->draw(&myOLED);
 	
-    myOLED.update();
+   // myOLED.update();
 	
     scrLoop=millis();
     }
@@ -458,4 +478,19 @@ void loop() {
 	trm.process(mls);
 	//suvid.process_suvid(mls);
 //trm.processTermometr();
+}
+
+
+void draw(void) {
+	
+	char buf[20];
+	Time t = rtc.time();
+	snprintf(buf, sizeof(buf), "%04d-%02d-%02d %02d:%02d:%02d",
+		t.yr, t.mon, t.date,
+		t.hr, t.min, t.sec);
+	// graphic commands to redraw the complete screen should be placed here  
+	//u8g.setFont(u8g_font_unifont);
+	//u8g.setFont(u8g_font_osb21);
+	//u8g.setPrintPos(0,20);
+	u8g.drawStr(0,10,buf);
 }
