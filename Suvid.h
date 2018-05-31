@@ -42,7 +42,7 @@
 
 const uint16_t test_time=1000;
 
-class Suvid {
+class Suvid : public Mode {
 private:
 	Heater * heater;
 	DallasTerm * term;
@@ -54,6 +54,7 @@ private:
 	int8_t err;
 	long time;
 	void error(uint8_t);
+	void draw(U8GLIB * u8);
 public:
 	Suvid(Heater * he, DallasTerm * tr, Beeper * bee) {
 		heater = he;

@@ -94,15 +94,17 @@ Time_::Time_(const uint16_t yr, const uint8_t mon, const uint8_t date,
 }
 
 char * Clock::get_date_str() {
-	const SPISession s(RST_PIN, DAT_PIN, CLK_PIN);
+	//const SPISession s(RST_PIN, DAT_PIN, CLK_PIN);
 
-	writeOut(kClockBurstRead, true);
-	readIn();
-	readIn();
-	readIn();
-	uint8_t date = bcdToDec(readIn());
-	uint8_t mon = bcdToDec(readIn());
-	uint8_t year = 2000 + bcdToDec(readIn());
+	//writeOut(kClockBurstRead, true);
+	//readIn();
+	//readIn();
+	//readIn();
+	//uint8_t date = bcdToDec(readIn());
+	//uint8_t mon = bcdToDec(readIn());
+	uint8_t date = bcdToDec(readRegister(kDateReg));
+	uint8_t mon = bcdToDec(readRegister(kMonthReg));
+	uint16_t year = 2000+bcdToDec(readRegister(kYearReg));
 
 	char buf[11];
 	snprintf(buf, sizeof(buf), "%02d-%02d-%04d", date, mon, year);
@@ -212,7 +214,7 @@ Time_ Clock::time() {
 	t.date = bcdToDec(readIn());
 	t.mon = bcdToDec(readIn());
 	t.day = bcdToDec(readIn());
-	t.year = 2000 + bcdToDec(readIn());
+	t.year = bcdToDec(readIn());
 	return t;
 }
 
@@ -229,7 +231,7 @@ void Clock::time(const Time_ t) {
 	writeOut(decToBcd(t.date));
 	writeOut(decToBcd(t.mon));
 	writeOut(decToBcd(t.day));
-	writeOut(decToBcd(t.year - 2000));
+	writeOut(decToBcd(t.year));
 	// All clock registers *and* the WP register have to be written for the time
 	// to be set.
 	writeOut(0);  // Write protection register.

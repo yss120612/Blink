@@ -2,11 +2,13 @@
 //#include <RTClib.h>
 
 
+
 #include <EEPROM.h>
 //#include <OLED_I2C.h>
 #include <OneWire.h>
 #include <U8glib.h>
 
+#include "Mode.h"
 #include "Clock.h"
 #include "Beeper.h"
 #include "DallasTerm.h"
@@ -22,9 +24,13 @@
 #include "Suvid.h"
 
 
+#define MODE_MAIN 0
+#define MODE_SUVID 1
+#define MODE_DISCIL 2
+#define MODE_RECTIFY 3
+#define MODE_SETUP 99
 
-
-
+uint8_t mode;//Режим работы устройства в данный момент
 
 //extern uint8_t SmallFont[];
 //extern uint8_t MediumNumbers[];
@@ -231,6 +237,7 @@ void setup() {
 							 //u8g.setFont(u8g_font_7x14);
 							 //u8g.setFont(u8g_font_8x13);
 							 //u8g.setFont(u8g_font_);
+  mode = MODE_MAIN;
 }
 
 void onLClick(){
@@ -485,8 +492,18 @@ void loop() {
 }
 
 
+
+
 void draw(void) {
-	
+	switch (mode)
+	{
+	case MODE_MAIN:
+		break;
+	default:
+		break;
+	}
+
+
 	char buf[20];
 	
 	// graphic commands to redraw the complete screen should be placed here  
@@ -494,4 +511,5 @@ void draw(void) {
 	//u8g.setFont(u8g_font_osb21);
 	//u8g.setPrintPos(0,20);
 	u8g.drawStr(0,10,rtc.get_time_str());
+	u8g.drawStr(0, 30, rtc.get_date_str());
 }

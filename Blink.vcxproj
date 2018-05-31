@@ -91,6 +91,7 @@
     <ClInclude Include="Heater.h" />
     <ClInclude Include="Kran.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Mode.h" />
     <ClInclude Include="Suvid.h" />
     <ClInclude Include="Termometer.h" />
     <ClInclude Include="Uroven.h" />
@@ -105,6 +106,7 @@
     <ClCompile Include="Heater.cpp" />
     <ClCompile Include="Kran.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Mode.cpp" />
     <ClCompile Include="Suvid.cpp" />
     <ClCompile Include="Termometer.cpp" />
     <ClCompile Include="Uroven.cpp" />

@@ -5,7 +5,7 @@
 #include "Suvid.h"
 
 
-void Suvid::display(OLED * disp) {
+void Suvid::draw(U8GLIB * u8) {
 	
 }
 
