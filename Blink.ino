@@ -1,11 +1,13 @@
 
 //#include <RTClib.h>
-#include <DS1302.h>
+
+
 #include <EEPROM.h>
 //#include <OLED_I2C.h>
 #include <OneWire.h>
 #include <U8glib.h>
 
+#include "Clock.h"
 #include "Beeper.h"
 #include "DallasTerm.h"
 #include "Uroven.h"
@@ -74,7 +76,7 @@ Suvid suvid(&heater,&trm,&beeper);
 //DS1302 clock(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
 
 //iarduino_RTC clock(RTC_DS1302, CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
-DS1302 rtc(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
+Clock rtc;
 YsMenuComponent * menu;
 //YsMenuParameter *par;
 
@@ -204,6 +206,8 @@ void setup() {
 
   interrupts();
   trm.set12bit();
+  rtc.setup(CLOCK_RST_PIN, CLOCK_DAT_PIN, CLOCK_CLK_PIN);
+  rtc.halt(false);
  // heater.start();
  /* Time t(2018, 5, 28, 23, 00, 00, Time::kSunday);
 
@@ -484,13 +488,10 @@ void loop() {
 void draw(void) {
 	
 	char buf[20];
-	Time t = rtc.time();
-	snprintf(buf, sizeof(buf), "%04d-%02d-%02d %02d:%02d:%02d",
-		t.yr, t.mon, t.date,
-		t.hr, t.min, t.sec);
+	
 	// graphic commands to redraw the complete screen should be placed here  
 	//u8g.setFont(u8g_font_unifont);
 	//u8g.setFont(u8g_font_osb21);
 	//u8g.setPrintPos(0,20);
-	u8g.drawStr(0,10,buf);
+	u8g.drawStr(0,10,rtc.get_time_str());
 }
