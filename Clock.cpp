@@ -122,6 +122,27 @@ char * Clock::get_time_str() {
 	return buf;
 }
 
+void Clock::set_time(const uint8_t sec, const uint8_t min, const uint8_t hour ) {
+	// We want to maintain the Clock Halt flag if it is set.
+	const uint8_t ch_value = readRegister(kSecondReg) & 0x80;
+
+	const SPISession s(RST_PIN, DAT_PIN, CLK_PIN);
+
+	writeOut(kClockBurstWrite);
+	writeOut(ch_value | decToBcd(sec));
+	writeOut(decToBcd(min));
+	writeOut(decToBcd(hour));
+	s.~SPISession();
+	// All clock registers *and* the WP register have to be written for the time
+	// to be set.
+
+	// Write protection register.
+	writeRegister(kWriteProtectReg, 0);
+	//writeOut(0); 
+}
+
+
+
 void Clock::setup(const uint8_t ce_pin, const uint8_t io_pin, const uint8_t sclk_pin) {
 	RST_PIN = ce_pin;
 	DAT_PIN = io_pin;

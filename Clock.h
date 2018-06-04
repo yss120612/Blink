@@ -35,6 +35,7 @@ public:
 	Clock(){};
 	void setDate(uint8_t d, uint8_t m, uint8_t y);
 	void setup(uint8_t rst, uint8_t dat, uint8_t clk);
+	void set_time(const uint8_t sec, const uint8_t min, const uint16_t year);
 
 	void writeProtect(bool enable);
 	void halt(bool value);
